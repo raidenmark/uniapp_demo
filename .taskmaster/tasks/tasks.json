@@ -1,0 +1,698 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "项目初始化和基础架构搭建",
+        "description": "创建uni-app项目，配置Vue3+TypeScript环境，建立完整项目目录结构",
+        "details": "使用uni-app CLI创建Vue3+TypeScript项目，配置package.json依赖(包括@dcloudio/types、typescript、vite等)，创建src目录结构(api、components、pages、store、utils、types)，配置tsconfig.json、vite.config.ts、manifest.json和pages.json基础配置，建立static目录存放静态资源。项目名称为unicloud-file-demo，支持H5、Android、微信小程序、支付宝小程序。",
+        "testStrategy": "验证项目目录结构完整性，检查TypeScript编译无错误，确认依赖安装成功，测试开发环境启动正常",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "使用uni-app CLI创建项目基础结构",
+            "description": "使用uni-app CLI创建Vue3+TypeScript项目模板，设置项目名称为unicloud-file-demo",
+            "dependencies": [],
+            "details": "执行uni-app创建命令，选择Vue3+TypeScript模板，配置项目名称为unicloud-file-demo，初始化项目基础文件结构，包括src、static、uni_modules等目录",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "配置package.json依赖和脚本",
+            "description": "安装和配置项目所需的依赖包，包括uni-app核心库、TypeScript相关依赖等",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "配置package.json，添加@dcloudio/types、typescript、vite、@dcloudio/vite-plugin-uni等依赖，设置dev、build、type-check等npm脚本命令，确保支持H5、Android、微信小程序、支付宝小程序构建",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "创建完整的src目录结构",
+            "description": "建立项目的目录架构，创建所有必要的源码目录和初始文件",
+            "dependencies": [
+              "1.2"
+            ],
+            "details": "创建src目录下的完整结构：api/（接口封装）、components/（公共组件）、pages/（页面文件）、store/（状态管理）、utils/（工具函数）、types/（类型定义），同时创建对应的index文件和基础导出",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "配置TypeScript编译选项",
+            "description": "配置tsconfig.json文件，设置TypeScript编译参数和类型检查选项",
+            "dependencies": [
+              "1.3"
+            ],
+            "details": "创建tsconfig.json文件，配置编译目标为ES2020，模块系统为ESNext，启用严格类型检查，配置路径映射，设置包含和排除的文件模式，确保与uni-app框架兼容",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "配置Vite构建工具",
+            "description": "配置vite.config.ts文件，设置构建参数和插件选项",
+            "dependencies": [
+              "1.4"
+            ],
+            "details": "创建vite.config.ts文件，配置uni插件，设置构建输出目录，配置别名路径，设置开发服务器参数，配置多端构建选项，确保支持TypeScript和Vue3语法",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "配置应用基础配置文件",
+            "description": "配置manifest.json和pages.json等uni-app核心配置文件",
+            "dependencies": [
+              "1.5"
+            ],
+            "details": "配置manifest.json设置应用基本信息、平台适配参数、权限配置等。配置pages.json设置页面路由、导航栏样式、tabBar等。创建App.vue根组件和main.ts入口文件，建立static目录存放图标等静态资源",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "UniCloud云服务配置",
+        "description": "配置UniCloud云服务空间，初始化云数据库和云存储",
+        "details": "创建uniCloud目录结构，在HBuilderX中创建云服务空间，配置uniCloud/database/db_init.json定义files和users集合schema。files集合包含字段：_id、fileName、originalName、fileType、fileUrl、fileSize、uploadTime、userId、platform、duration、width、height、status、tags。配置数据库权限规则，确保Demo用户(demo_user_001)可以正常操作。配置云存储bucket，设置文件上传权限。",
+        "testStrategy": "验证云服务空间创建成功，测试数据库连接，检查集合schema配置正确，验证云存储上传权限配置",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "创建UniCloud云服务空间",
+            "description": "在HBuilderX中创建云服务空间，配置基础云环境",
+            "dependencies": [],
+            "details": "在HBuilderX中创建UniCloud云服务空间，选择阿里云或腾讯云服务商。获取云服务空间的spaceid和相关配置信息，在项目中初始化UniCloud配置。创建uniCloud目录结构，包括database、cloudfunctions等必要目录。配置项目的云服务空间关联。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "配置云数据库集合schema",
+            "description": "创建并配置files和users集合的数据库schema定义",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "创建uniCloud/database/db_init.json文件，定义files集合schema包含字段：_id、fileName、originalName、fileType、fileUrl、fileSize、uploadTime、userId、platform、duration、width、height、status、tags。定义users集合基础schema。设置字段类型、必填项、默认值等约束条件。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "设置数据库权限规则",
+            "description": "配置数据库读写权限，确保Demo用户可以正常操作",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "在db_init.json中配置数据库权限规则，设置files集合的读写权限。配置Demo用户(demo_user_001)的访问权限，确保可以创建、读取、更新、删除文件记录。设置适当的安全规则，防止非授权访问。配置用户集合的基础权限。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "配置云存储bucket",
+            "description": "设置云存储空间和文件上传权限配置",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "在云服务空间中创建云存储bucket，配置文件存储路径结构。设置文件上传权限，允许客户端直接上传文件。配置文件类型限制，支持图片(jpg、png、gif)和视频(mp4、mov、avi)格式。设置文件大小限制和存储路径规则。配置CDN加速访问。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "测试云服务连接和功能",
+            "description": "验证云服务配置正确性和基础功能测试",
+            "dependencies": [
+              "2.2",
+              "2.3",
+              "2.4"
+            ],
+            "details": "测试项目与云服务空间的连接状态，验证数据库连接正常。测试数据库集合创建和schema配置生效。尝试基础的数据库读写操作，验证权限规则正确。测试云存储上传功能，确认文件可以正常上传和访问。验证Demo用户权限配置正确。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "TypeScript类型定义和接口封装",
+        "description": "定义项目所需的TypeScript类型和API接口封装",
+        "details": "创建types/file.ts定义FileRecord、FileUploadParams等接口类型，创建types/common.ts定义通用类型。创建api/file.ts封装FileAPI类，包含uploadFile、getFileList、deleteFile等方法，使用固定Demo用户ID(demo_user_001)。创建utils/platform.ts实现平台判断工具，创建utils/file.ts实现文件处理工具函数。所有接口方法必须包含完整的错误处理和类型定义。",
+        "testStrategy": "TypeScript类型检查通过，接口方法调用测试，平台判断功能验证，文件处理工具函数单元测试",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "创建文件相关类型定义",
+            "description": "创建types/file.ts文件，定义FileRecord、FileUploadParams、FileListParams等文件操作相关的TypeScript接口类型",
+            "dependencies": [],
+            "details": "定义FileRecord接口包含id、fileName、originalName、fileType、fileUrl、fileSize、uploadTime、userId、platform、duration、width、height、status、tags等字段。定义FileUploadParams接口包含filePath、fileType、fileName等上传参数。定义FileListParams接口包含分页、筛选等查询参数。所有类型必须严格符合TypeScript规范。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "创建通用类型定义",
+            "description": "创建types/common.ts文件，定义项目中使用的通用TypeScript类型和枚举",
+            "dependencies": [],
+            "details": "定义ApiResponse<T>通用响应接口，包含code、message、data字段。定义LoadingState、ErrorState等状态类型。定义PlatformType枚举(H5、Android、微信小程序、支付宝小程序)。定义FileType枚举(image、video)。创建工具类型如Optional、Required等。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "封装FileAPI类和接口方法",
+            "description": "创建api/file.ts文件，封装FileAPI类，实现uploadFile、getFileList、deleteFile等文件操作方法",
+            "dependencies": [
+              "3.1",
+              "3.2"
+            ],
+            "details": "创建FileAPI类，使用固定Demo用户ID(demo_user_001)。实现uploadFile方法处理文件上传到UniCloud存储，包含文件元信息提取。实现getFileList方法支持分页和筛选查询。实现deleteFile方法处理文件删除。所有方法必须包含完整的try-catch错误处理，返回统一的ApiResponse格式，并提供详细的TypeScript类型定义。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "创建平台判断和文件处理工具函数",
+            "description": "创建utils/platform.ts和utils/file.ts文件，实现平台判断工具和文件处理工具函数",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "在utils/platform.ts中实现getCurrentPlatform函数判断当前运行平台，isH5、isApp、isMiniProgram等平台判断函数。在utils/file.ts中实现formatFileSize函数格式化文件大小显示，getFileExtension函数获取文件扩展名，validateFileType函数验证文件类型，generateFileName函数生成唯一文件名等工具函数。所有函数必须包含完整的TypeScript类型定义和错误处理。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "状态管理和工具函数实现",
+        "description": "实现Pinia状态管理和通用工具函数",
+        "details": "创建store/index.ts配置Pinia，创建store/file.ts实现文件状态管理，包含fileList、loading、error等响应式状态，以及uploadFile、loadFileList、deleteFile等action方法。创建utils/common.ts实现通用工具函数如时间格式化、文件大小格式化等。集成uni.showToast、uni.showLoading等uni-app API进行用户反馈。",
+        "testStrategy": "状态管理功能测试，工具函数单元测试，用户反馈机制验证，响应式数据更新测试",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "配置Pinia状态管理",
+            "description": "创建store/index.ts配置Pinia状态管理器，设置Vue应用集成",
+            "dependencies": [],
+            "details": "在store/index.ts中引入createPinia创建状态管理实例，配置Pinia插件选项，在main.ts中注册Pinia到Vue应用。确保TypeScript类型支持完整，配置开发环境下的调试工具。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现文件状态管理Store",
+            "description": "创建store/file.ts实现文件相关的状态管理，包含响应式状态和action方法",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "在store/file.ts中使用defineStore定义文件状态管理，包含fileList、loading、error、currentFile等响应式状态。实现uploadFile、loadFileList、deleteFile、updateFileStatus等action方法，集成FileAPI调用。添加完整的TypeScript类型定义，确保状态变更的类型安全。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "创建通用工具函数",
+            "description": "在utils/common.ts中实现通用工具函数集合",
+            "dependencies": [],
+            "details": "创建utils/common.ts实现formatTime时间格式化函数、formatFileSize文件大小格式化函数、generateFileId文件ID生成函数、validateFileType文件类型验证函数。添加getFileExtension获取文件扩展名、isImageFile判断是否为图片文件等辅助函数。确保所有函数都有完整的TypeScript类型定义和错误处理。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "集成用户反馈机制",
+            "description": "封装uni-app用户反馈API，创建统一的消息提示和加载状态管理",
+            "dependencies": [
+              "4.2"
+            ],
+            "details": "在utils/feedback.ts中封装uni.showToast、uni.showLoading、uni.hideLoading、uni.showModal等uni-app API。创建showSuccess、showError、showLoading、hideLoading、showConfirm等标准化方法。在文件状态管理中集成这些反馈方法，确保用户操作有明确的状态反馈。添加loading状态的全局管理。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "文件上传组件开发",
+        "description": "开发FileUploader组件，支持图片和视频上传功能",
+        "details": "创建components/FileUploader.vue组件，使用Vue3 Composition API和<script setup>语法。支持图片格式(JPG、PNG、GIF)和视频格式(MP4、MOV)，实现uni.chooseImage和uni.chooseVideo API调用，支持多选上传(最多6张图片)。包含上传前预览、上传进度显示、支持删除和重新上传。集成UniCloud云存储上传API，自动获取文件元信息(宽高、时长等)。组件必须包含loading状态管理和错误处理。",
+        "testStrategy": "文件选择功能测试，上传进度显示验证，预览功能测试，多端兼容性测试，错误处理场景验证",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "创建基础上传组件结构",
+            "description": "创建FileUploader.vue组件文件，建立基础的Vue3组件结构和TypeScript类型定义",
+            "dependencies": [],
+            "details": "在src/components目录下创建FileUploader.vue文件，使用<script setup>语法建立基础组件结构。定义组件props接口(支持的文件类型、最大文件数量、文件大小限制等)和emits事件(upload-success、upload-error、file-change等)。创建组件的基础模板结构，包含文件选择区域、预览区域和操作按钮区域。定义组件内部的响应式数据结构，包含文件列表、上传状态、错误信息等。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现图片选择和预览功能",
+            "description": "实现图片文件选择、预览显示和基础操作功能",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "使用uni.chooseImage API实现图片选择功能，支持JPG、PNG、GIF格式，最多选择6张图片。实现图片预览功能，使用image组件显示缩略图，支持点击查看大图。添加图片删除功能，可以在预览状态下删除选中的图片。实现图片拖拽排序功能(H5端)。获取图片元信息如宽度、高度、文件大小等。添加图片压缩选项配置。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "实现视频选择和预览功能",
+            "description": "实现视频文件选择、预览播放和基础操作功能",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "使用uni.chooseVideo API实现视频选择功能，支持MP4、MOV格式，限制单个视频文件。实现视频预览功能，使用video组件显示视频缩略图和播放控制。添加视频删除和重新选择功能。获取视频元信息如时长、分辨率、文件大小等。实现视频播放控制，包含播放、暂停、进度控制等基础功能。添加视频压缩和质量选择选项。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "集成UniCloud上传API",
+            "description": "集成UniCloud云存储服务，实现文件上传到云端功能",
+            "dependencies": [
+              "5.2",
+              "5.3"
+            ],
+            "details": "在api/file.ts中实现uploadToCloud方法，使用uniCloud.uploadFile API上传文件到云存储。配置云存储路径规则，按用户ID和日期分类存储文件。实现文件重命名逻辑，避免文件名冲突。添加文件类型验证，确保只上传允许的格式。实现上传成功后将文件信息保存到云数据库的逻辑。添加云存储错误处理，如网络错误、存储空间不足等情况的处理。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "添加上传进度和错误处理",
+            "description": "实现上传进度显示、错误处理和用户反馈功能",
+            "dependencies": [
+              "5.4"
+            ],
+            "details": "实现上传进度条显示，使用uni.uploadFile的进度回调更新上传进度。添加上传状态管理，包含等待上传、上传中、上传成功、上传失败等状态。实现错误处理机制，包含网络错误、文件格式错误、文件大小超限、云存储错误等情况。添加用户友好的错误提示信息，使用uni.showToast显示操作结果。实现上传重试功能，失败后可以重新上传。添加上传取消功能，可以中断正在进行的上传。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "实现多端兼容性适配",
+            "description": "确保组件在H5、Android、微信小程序、支付宝小程序等平台正常工作",
+            "dependencies": [
+              "5.5"
+            ],
+            "details": "实现平台检测逻辑，根据不同平台调用对应的API。适配H5端的文件拖拽上传功能，支持拖拽图片到上传区域。适配小程序端的文件选择限制，处理小程序特有的权限申请。适配Android端的文件访问权限，确保能正常读取和上传文件。统一各平台的UI表现，确保组件在不同平台下的显示效果一致。添加平台特定的优化，如H5端的文件预览优化、小程序端的性能优化等。测试各平台的兼容性，确保核心功能正常工作。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "文件列表组件开发",
+        "description": "开发FileList组件，实现文件列表展示和基础筛选功能",
+        "details": "创建components/FileList.vue组件，采用网格布局(2列)展示文件。实现按上传时间倒序排列，支持按文件类型筛选(全部/图片/视频)。显示文件缩略图、文件名称、上传时间等信息。集成简单分页功能，每页显示固定数量文件。支持点击跳转到文件预览页面。实现下拉刷新和上拉加载更多功能。组件必须响应式设计，适配多端显示。",
+        "testStrategy": "列表展示功能测试，筛选功能验证，分页加载测试，响应式布局验证，多端兼容性测试",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "创建FileList组件基础结构",
+            "description": "创建components/FileList.vue文件，建立组件基础结构和Props定义",
+            "dependencies": [],
+            "details": "创建FileList.vue文件，使用Vue3 Composition API和TypeScript。定义组件Props接口，包括文件列表数据、加载状态、错误状态等。建立组件基础模板结构，包括筛选栏、文件网格容器、分页区域。设置组件样式基础框架，准备响应式布局。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现文件网格布局和展示",
+            "description": "实现2列网格布局，展示文件缩略图、名称和上传时间",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "实现响应式网格布局，默认2列显示，小屏幕自适应。为图片文件显示缩略图，视频文件显示视频封面或默认图标。显示文件名称（截断过长文件名）、上传时间（友好时间格式）。实现文件项点击事件，支持跳转到预览页面。添加文件加载失败的占位图。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "实现文件类型筛选功能",
+            "description": "添加筛选栏，实现按文件类型筛选（全部/图片/视频）",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "创建筛选栏组件，包含全部、图片、视频三个筛选选项。实现筛选状态管理和样式切换。实现筛选逻辑，根据fileType字段过滤文件列表。优化筛选性能，避免不必要的重新渲染。筛选切换时重置分页到第一页。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "实现分页和加载更多功能",
+            "description": "集成分页功能，实现上拉加载更多和下拉刷新",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "实现分页逻辑，每页显示固定数量文件（如10个）。集成uni-app的onReachBottom事件实现上拉加载更多。集成onPullDownRefresh事件实现下拉刷新。添加加载状态指示器和加载完成提示。处理无更多数据的边界情况。实现加载失败的重试机制。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "响应式设计和多端适配",
+            "description": "完善组件响应式设计，确保多端显示效果良好",
+            "dependencies": [
+              "6.2",
+              "6.3",
+              "6.4"
+            ],
+            "details": "优化响应式布局，根据屏幕宽度调整网格列数和间距。适配H5、小程序、APP端的样式差异。处理不同平台的图片显示和加载问题。优化触摸交互体验，调整按钮大小和间距。测试并修复各平台的兼容性问题。确保加载状态在各端显示正常。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "文件预览组件开发",
+        "description": "开发FilePreview组件，实现图片和视频预览功能",
+        "details": "创建components/FilePreview.vue组件，支持图片全屏查看、基础缩放功能、左右滑动切换。支持视频播放，包含基础播放控制(播放/暂停、进度条、音量控制)。使用uni-app的image和video组件，确保多端兼容性。实现图片双击缩放、手势缩放功能。支持预加载相邻文件提升用户体验。组件支持传入文件列表和当前索引，实现批量预览功能。",
+        "testStrategy": "图片预览功能测试，视频播放功能验证，手势操作测试，切换功能验证，多端兼容性测试",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "创建FilePreview组件基础结构",
+            "description": "创建components/FilePreview.vue组件文件，定义基础模板结构和TypeScript接口",
+            "dependencies": [],
+            "details": "创建FilePreview.vue组件，定义Props接口(文件列表、当前索引、显示状态等)，设置基础模板结构包含遮罩层、内容区域、关闭按钮。定义组件的基础样式和布局，实现组件的显示/隐藏控制逻辑。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现图片预览基础功能",
+            "description": "开发图片全屏显示、基础缩放和双击缩放功能",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "使用uni-app的image组件实现图片全屏显示，添加图片加载状态和错误处理。实现双击缩放功能，设置最小和最大缩放比例。添加图片居中显示逻辑，确保不同尺寸图片的良好显示效果。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "实现手势操作和缩放控制",
+            "description": "开发图片手势缩放、拖拽移动和边界限制功能",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "实现图片手势缩放功能，支持双指缩放操作。添加图片拖拽移动功能，缩放后可以移动查看不同区域。实现边界检测和回弹效果，防止图片移出可视区域。确保手势操作在不同端的兼容性。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "开发视频播放功能",
+            "description": "实现视频播放控制，包括播放/暂停、进度条、音量控制等功能",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "使用uni-app的video组件实现视频播放功能。添加自定义播放控制界面，包括播放/暂停按钮、进度条、时间显示、音量控制。实现视频加载状态显示和错误处理。确保视频播放在各平台的兼容性。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "实现文件切换和预加载功能",
+            "description": "开发左右滑动切换文件功能，实现相邻文件预加载提升用户体验",
+            "dependencies": [
+              "7.2",
+              "7.4"
+            ],
+            "details": "实现左右滑动切换文件功能，支持触摸滑动和按钮点击。添加切换动画效果，提升用户体验。实现相邻文件预加载机制，提前加载前后文件缩略图。添加文件索引显示，显示当前文件在列表中的位置。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "多端兼容性优化和功能完善",
+            "description": "确保组件在各平台正常运行，完善交互细节和错误处理",
+            "dependencies": [
+              "7.3",
+              "7.5"
+            ],
+            "details": "测试组件在H5、Android、微信小程序、支付宝小程序的兼容性。优化不同平台的交互体验差异。完善错误处理机制，添加网络异常、文件加载失败等情况的处理。优化组件性能，确保大文件预览的流畅性。添加组件使用文档和示例。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "主要页面开发",
+        "description": "开发主要页面：首页、上传页、预览页",
+        "details": "创建pages/index/index.vue首页，集成FileList组件展示文件列表，添加导航到上传页面的入口。创建pages/upload/upload.vue上传页面，集成FileUploader组件，实现文件上传完成后返回首页。创建pages/preview/preview.vue预览页面，集成FilePreview组件，支持接收路由参数显示指定文件。配置pages.json路由，设置页面标题、导航栏样式等。实现页面间的数据传递和状态同步。",
+        "testStrategy": "页面路由功能测试，组件集成验证，页面间数据传递测试，用户交互流程验证，多端页面显示测试",
+        "priority": "high",
+        "dependencies": [
+          5,
+          6,
+          7
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "创建首页和文件列表集成",
+            "description": "创建pages/index/index.vue首页文件，集成FileList组件展示文件列表，添加导航到上传页面的入口按钮",
+            "dependencies": [],
+            "details": "使用Vue3 Composition API创建首页组件，导入并使用FileList组件，设置页面标题为'文件管理'，添加右上角'上传'按钮，实现点击跳转到上传页面，配置页面样式和布局，确保多端显示效果一致",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "创建上传页面和组件集成",
+            "description": "创建pages/upload/upload.vue上传页面，集成FileUploader组件，实现文件上传完成后返回首页功能",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "创建上传页面组件，导入FileUploader组件，设置页面标题为'上传文件'，监听上传完成事件，上传成功后显示提示信息并自动返回首页，添加返回按钮，处理上传失败的错误提示",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "创建预览页面和路由参数处理",
+            "description": "创建pages/preview/preview.vue预览页面，集成FilePreview组件，支持接收路由参数显示指定文件",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "创建预览页面组件，使用onLoad生命周期接收路由参数(fileId, fileUrl, fileType)，导入FilePreview组件并传入文件信息，设置页面标题为'文件预览'，添加返回和分享功能，处理文件不存在或加载失败的情况",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "配置页面路由和数据传递机制",
+            "description": "配置pages.json路由设置，实现页面间的数据传递和状态同步机制",
+            "dependencies": [
+              "8.1",
+              "8.2",
+              "8.3"
+            ],
+            "details": "在pages.json中配置三个页面的路由信息，设置页面标题、导航栏样式、页面参数等。实现页面间数据传递，使用uni.navigateTo传递文件信息到预览页，配置页面返回逻辑，确保状态同步更新，设置页面权限和访问控制",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "文件管理和删除功能",
+        "description": "实现文件删除功能和基础文件管理操作",
+        "details": "在FileList组件中添加文件删除功能，支持长按或点击操作按钮触发删除。实现删除确认弹窗，使用uni.showModal确认用户操作。在FileAPI中实现deleteFile方法，调用UniCloud数据库删除记录，同时删除云存储中的文件。实现批量删除功能(可选)。添加文件信息查看功能，显示文件详细信息如大小、上传时间、分辨率等。更新状态管理，确保删除后列表实时更新。",
+        "testStrategy": "单个文件删除测试，删除确认流程验证，云存储文件清理验证，列表状态更新测试，文件信息显示测试",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "FileList组件删除功能实现",
+            "description": "在FileList组件中添加删除按钮和长按删除功能，实现删除操作的UI交互",
+            "dependencies": [],
+            "details": "在FileList.vue组件中为每个文件项添加删除按钮，实现长按删除和点击删除操作。添加删除状态的loading效果，优化用户体验。设计删除按钮样式，确保在不同设备上都有良好的交互体验。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "删除确认弹窗和用户交互",
+            "description": "实现删除确认弹窗，使用uni.showModal确认用户删除操作",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "使用uni.showModal实现删除确认弹窗，提供取消和确认选项。设计友好的提示文案，显示将要删除的文件名。处理用户取消和确认的回调逻辑，确保用户体验流畅。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "FileAPI删除方法和云存储清理",
+            "description": "在FileAPI中实现deleteFile方法，删除数据库记录并清理云存储文件",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "在api/file.ts中实现deleteFile方法，先删除UniCloud数据库中的文件记录，然后调用云存储API删除实际文件。添加完整的错误处理机制，确保删除操作的原子性。实现删除状态的返回和错误信息处理。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "文件信息查看和状态管理更新",
+            "description": "添加文件详细信息查看功能，更新store状态管理确保删除后列表实时更新",
+            "dependencies": [
+              "9.3"
+            ],
+            "details": "实现文件信息查看弹窗，显示文件大小、上传时间、分辨率等详细信息。在store/file.ts中添加删除文件的state管理方法，确保删除后文件列表实时更新。优化列表刷新机制，避免不必要的重新请求。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "多端适配和平台打包",
+        "description": "实现H5、Android、微信小程序、支付宝小程序的适配和打包配置",
+        "details": "配置manifest.json适配各平台特性，设置应用图标、启动页、权限配置等。实现H5响应式设计，确保PC和移动端浏览器正常显示。配置微信小程序appid、支付宝小程序appid，适配小程序特有的API和交互模式。配置Android打包参数，包括应用签名、图标、权限等。在utils/platform.ts中实现平台检测，根据不同平台调用对应的API。添加平台标识功能，上传文件时自动标记来源平台。测试各平台的文件选择、上传、预览功能。",
+        "testStrategy": "H5版本功能测试，Android APK打包和安装测试，微信小程序预览和上传测试，支付宝小程序基础功能验证，平台标识功能测试",
+        "priority": "high",
+        "dependencies": [
+          9
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "配置H5响应式样式和布局",
+            "description": "实现H5版本的响应式设计，确保在PC和移动端浏览器正常显示",
+            "dependencies": [],
+            "details": "在uni.scss中添加响应式样式变量，配置断点布局。优化文件列表在不同屏幕尺寸下的展示效果，调整组件间距和字体大小。配置H5特有的导航栏和状态栏样式。确保文件上传和预览在浏览器环境下正常工作。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "配置微信小程序适配参数",
+            "description": "配置manifest.json中微信小程序相关参数和API适配",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "在manifest.json中配置微信小程序appid、版本号、权限配置。适配微信小程序的文件选择API(uni.chooseImage/chooseVideo)，配置上传域名白名单。调整小程序专有的导航栏样式和页面配置。配置分包加载优化性能。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "配置支付宝小程序适配参数",
+            "description": "配置支付宝小程序特有的配置参数和API兼容性",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "在manifest.json中配置支付宝小程序appid和相关参数。适配支付宝小程序的API差异，特别是文件上传和选择接口。配置支付宝小程序的页面样式和交互规范。测试在支付宝开发者工具中的兼容性。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "配置Android打包参数和签名",
+            "description": "配置Android APK打包所需的参数、图标、权限和签名配置",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "在manifest.json中配置Android平台参数，包括应用包名、版本号、图标路径。配置权限列表(文件读写、网络访问、相机等)。准备不同尺寸的应用图标和启动页。配置应用签名文件和打包参数。测试APK打包流程。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "实现平台检测工具函数",
+            "description": "在utils/platform.ts中实现平台检测和API适配工具",
+            "dependencies": [
+              "10.4"
+            ],
+            "details": "创建utils/platform.ts，实现平台类型检测函数(isH5、isApp、isMpWeixin、isMpAlipay)。实现平台特定API调用的适配器模式，统一文件选择、上传等接口。添加平台特性检测，如是否支持某些API功能。提供平台相关的配置获取工具。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "添加文件上传平台标识功能",
+            "description": "在文件上传时自动标记来源平台，并在文件列表中显示",
+            "dependencies": [
+              "10.5"
+            ],
+            "details": "修改FileAPI.uploadFile方法，自动添加platform字段记录上传平台。在文件列表组件中显示平台标识图标(H5、Android、微信、支付宝)。更新文件类型定义，添加platform字段。在文件预览页面显示详细的平台信息。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "各平台功能测试和优化",
+            "description": "在各个平台测试核心功能并进行性能优化",
+            "dependencies": [
+              "10.6"
+            ],
+            "details": "在H5浏览器中测试文件上传、列表显示、预览功能。生成Android APK并在真机测试完整流程。在微信开发者工具测试小程序功能和上传限制。在支付宝开发者工具验证基础功能。记录各平台差异并进行兼容性优化。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-27T15:36:23.493Z",
+      "updated": "2025-08-27T20:27:16.550Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

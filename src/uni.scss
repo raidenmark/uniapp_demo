@@ -1,0 +1,200 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+
+/* 颜色变量 */
+
+/* 行为相关颜色 */
+$uni-color-primary: #007aff;
+$uni-color-success: #4cd964;
+$uni-color-warning: #f0ad4e;
+$uni-color-error: #dd524d;
+
+/* 文字基本颜色 */
+$uni-text-color: #333; // 基本色
+$uni-text-color-inverse: #fff; // 反色
+$uni-text-color-grey: #999; // 辅助灰色，如加载更多的提示信息
+$uni-text-color-placeholder: #808080;
+$uni-text-color-disable: #c0c0c0;
+
+/* 背景颜色 */
+$uni-bg-color: #fff;
+$uni-bg-color-grey: #f8f8f8;
+$uni-bg-color-hover: #f1f1f1; // 点击状态颜色
+$uni-bg-color-mask: rgba(0, 0, 0, 0.4); // 遮罩颜色
+
+/* 边框颜色 */
+$uni-border-color: #c8c7cc;
+
+/* 尺寸变量 */
+
+/* 文字尺寸 */
+$uni-font-size-sm: 12px;
+$uni-font-size-base: 14px;
+$uni-font-size-lg: 16;
+
+/* 图片尺寸 */
+$uni-img-size-sm: 20px;
+$uni-img-size-base: 26px;
+$uni-img-size-lg: 40px;
+
+/* Border Radius */
+$uni-border-radius-sm: 2px;
+$uni-border-radius-base: 3px;
+$uni-border-radius-lg: 6px;
+$uni-border-radius-circle: 50%;
+
+/* 水平间距 */
+$uni-spacing-row-sm: 5px;
+$uni-spacing-row-base: 10px;
+$uni-spacing-row-lg: 15px;
+
+/* 垂直间距 */
+$uni-spacing-col-sm: 4px;
+$uni-spacing-col-base: 8px;
+$uni-spacing-col-lg: 12px;
+
+/* 透明度 */
+$uni-opacity-disabled: 0.3; // 组件禁用态的透明度
+
+/* 文章场景相关 */
+$uni-color-title: #2c405a; // 文章标题颜色
+$uni-font-size-title: 20px;
+$uni-color-subtitle: #555; // 二级标题颜色
+$uni-font-size-subtitle: 18px;
+$uni-color-paragraph: #3f536e; // 文章段落颜色
+$uni-font-size-paragraph: 15px;
+
+/* 响应式设计断点 */
+$breakpoint-xs: 320px;   // 超小屏幕（手机竖屏）
+$breakpoint-sm: 576px;   // 小屏幕（手机横屏）
+$breakpoint-md: 768px;   // 中等屏幕（平板竖屏）
+$breakpoint-lg: 992px;   // 大屏幕（平板横屏、笔记本）
+$breakpoint-xl: 1200px;  // 超大屏幕（桌面）
+$breakpoint-xxl: 1600px; // 超超大屏幕（大桌面）
+
+/* 响应式容器宽度 */
+$container-xs: 100%;
+$container-sm: 540px;
+$container-md: 720px;
+$container-lg: 960px;
+$container-xl: 1140px;
+$container-xxl: 1320px;
+
+/* 文件管理专用样式变量 */
+$file-grid-gap: 20rpx;
+$file-item-height: 300rpx;
+$file-thumbnail-height: 200rpx;
+$navbar-height: 88rpx;
+
+/* H5平台专用样式 */
+/* #ifdef H5 */
+// PC端文件网格列数
+$file-grid-columns-xs: 2;  // 超小屏
+$file-grid-columns-sm: 2;  // 小屏
+$file-grid-columns-md: 3;  // 中屏
+$file-grid-columns-lg: 4;  // 大屏
+$file-grid-columns-xl: 5;  // 超大屏
+$file-grid-columns-xxl: 6; // 超超大屏
+
+// PC端样式调整
+$pc-padding: 40rpx;
+$pc-border-radius: 16rpx;
+$pc-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+/* #endif */
+
+/* 多端适配间距 */
+/* #ifdef H5 */
+$page-padding: 20rpx 40rpx;
+$component-padding: 32rpx;
+/* #endif */
+/* #ifdef MP */
+$page-padding: 20rpx;
+$component-padding: 24rpx;
+/* #endif */
+/* #ifdef APP-PLUS */
+$page-padding: 30rpx;
+$component-padding: 28rpx;
+/* #endif */
+
+/* 统一组件样式 */
+.responsive-container {
+  width: 100%;
+  max-width: $container-xl;
+  margin: 0 auto;
+  padding: 0 $uni-spacing-row-base;
+}
+
+/* H5响应式工具类 */
+/* #ifdef H5 */
+@media (max-width: #{$breakpoint-sm - 1}) {
+  .hide-xs { display: none !important; }
+}
+
+@media (min-width: $breakpoint-sm) and (max-width: #{$breakpoint-md - 1}) {
+  .hide-sm { display: none !important; }
+}
+
+@media (min-width: $breakpoint-md) and (max-width: #{$breakpoint-lg - 1}) {
+  .hide-md { display: none !important; }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .hide-lg { display: none !important; }
+  
+  // PC端优化
+  .file-grid {
+    grid-template-columns: repeat($file-grid-columns-lg, 1fr) !important;
+    gap: 24rpx !important;
+  }
+  
+  .file-item {
+    transition: all 0.3s ease !important;
+    
+    &:hover {
+      transform: translateY(-4rpx) !important;
+      box-shadow: $pc-shadow !important;
+    }
+  }
+  
+  .page-content {
+    padding: $pc-padding !important;
+  }
+}
+
+@media (min-width: $breakpoint-xl) {
+  .file-grid {
+    grid-template-columns: repeat($file-grid-columns-xl, 1fr) !important;
+    gap: 28rpx !important;
+  }
+}
+
+@media (min-width: $breakpoint-xxl) {
+  .file-grid {
+    grid-template-columns: repeat($file-grid-columns-xxl, 1fr) !important;
+    gap: 32rpx !important;
+  }
+  
+  .responsive-container {
+    max-width: $container-xxl;
+  }
+}
+
+// 针对移动设备的触控优化
+@media (hover: none) and (pointer: coarse) {
+  .file-item:hover {
+    transform: none !important;
+    box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08) !important;
+  }
+}
+/* #endif */

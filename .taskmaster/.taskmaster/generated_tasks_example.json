@@ -1,0 +1,305 @@
+{
+  "generation_metadata": {
+    "generated_by": "TaskMaster v2.0",
+    "generation_date": "2024-08-27T10:00:00Z",
+    "source_requirement": "开发基于yudao-cloud的AST代码风格分析系统",
+    "complexity_score": 0.85,
+    "auto_split_applied": true,
+    "total_estimated_hours": 156
+  },
+
+  "intelligent_analysis": {
+    "requirement_parsing": {
+      "primary_objective": "AST代码风格分析系统",
+      "detected_components": [
+        "JavaParser集成",
+        "风格提取算法", 
+        "规则引擎",
+        "数据存储",
+        "Web API"
+      ],
+      "technical_complexity": "high",
+      "business_complexity": "medium"
+    },
+    "skill_requirements": [
+      "Java 17 (权重: 0.9)",
+      "AST处理 (权重: 0.8)", 
+      "Spring Boot (权重: 0.7)",
+      "算法设计 (权重: 0.6)"
+    ],
+    "risk_assessment": {
+      "technical_risks": [
+        "AST解析性能瓶颈",
+        "大型代码库内存消耗"
+      ],
+      "timeline_risks": [
+        "JavaParser学习曲线",
+        "规则引擎复杂度低估"
+      ],
+      "resource_risks": [
+        "高级Java开发者依赖"
+      ]
+    }
+  },
+
+  "auto_generated_tasks": [
+    {
+      "id": "TM_AST_001",
+      "name": "JavaParser技术架构设计与原型验证",
+      "description": "设计基于JavaParser的AST解析架构，开发核心原型验证技术可行性",
+      "category": "analysis",
+      "priority": "critical",
+      "estimated_hours": 24,
+      "complexity_score": 0.7,
+      "assignee": "senior_developer",
+      "auto_generated_reason": "高技术风险需要优先验证",
+      
+      "auto_split_subtasks": [
+        {
+          "id": "TM_AST_001_1",
+          "name": "JavaParser API深度调研",
+          "hours": 8,
+          "deliverables": ["技术调研报告", "API使用示例"],
+          "skill_focus": "AST处理"
+        },
+        {
+          "id": "TM_AST_001_2", 
+          "name": "解析架构设计",
+          "hours": 10,
+          "deliverables": ["架构设计文档", "UML类图"],
+          "skill_focus": "系统架构"
+        },
+        {
+          "id": "TM_AST_001_3",
+          "name": "性能原型开发",
+          "hours": 6,
+          "deliverables": ["原型代码", "性能测试报告"],
+          "skill_focus": "性能优化"
+        }
+      ],
+      
+      "intelligent_dependencies": [],
+      "auto_detected_risks": [
+        {
+          "type": "technical",
+          "description": "JavaParser版本兼容性",
+          "mitigation": "多版本兼容测试",
+          "probability": 0.3
+        }
+      ],
+      
+      "quality_gates": [
+        "原型能解析yudao-cloud代码",
+        "内存使用<2GB处理1000文件", 
+        "解析速度<5秒/1000文件"
+      ]
+    },
+
+    {
+      "id": "TM_AST_002",
+      "name": "智能风格模式识别引擎开发",
+      "description": "基于机器学习和统计分析开发智能的代码风格模式识别引擎",
+      "category": "development",
+      "priority": "high",
+      "estimated_hours": 32,
+      "complexity_score": 0.9,
+      "assignee": "senior_developer",
+      "auto_generated_reason": "核心算法复杂度高，需要高级开发者",
+      
+      "auto_split_subtasks": [
+        {
+          "id": "TM_AST_002_1",
+          "name": "统计特征提取算法",
+          "hours": 12,
+          "deliverables": ["特征提取器", "算法文档"],
+          "dependencies": ["TM_AST_001"]
+        },
+        {
+          "id": "TM_AST_002_2",
+          "name": "模式识别机器学习模型",
+          "hours": 14,
+          "deliverables": ["ML模型代码", "训练数据集"],
+          "dependencies": ["TM_AST_002_1"]
+        },
+        {
+          "id": "TM_AST_002_3", 
+          "name": "智能规则生成器",
+          "hours": 6,
+          "deliverables": ["规则生成器", "配置模板"],
+          "dependencies": ["TM_AST_002_2"]
+        }
+      ],
+      
+      "intelligent_dependencies": ["TM_AST_001"],
+      "auto_detected_risks": [
+        {
+          "type": "complexity",
+          "description": "算法复杂度可能超出预期",
+          "mitigation": "分阶段实现，先实现基础版本",
+          "probability": 0.6
+        }
+      ]
+    },
+
+    {
+      "id": "TM_AST_003",
+      "name": "高性能规则引擎与缓存系统",
+      "description": "开发高性能的规则执行引擎，集成智能缓存提升处理速度",
+      "category": "development", 
+      "priority": "high",
+      "estimated_hours": 28,
+      "complexity_score": 0.6,
+      "assignee": "developer",
+      "auto_generated_reason": "性能要求高但技术相对成熟",
+      
+      "auto_split_subtasks": [
+        {
+          "id": "TM_AST_003_1",
+          "name": "规则引擎核心设计",
+          "hours": 10,
+          "focus": "规则解析和执行框架"
+        },
+        {
+          "id": "TM_AST_003_2",
+          "name": "多级缓存系统",
+          "hours": 12,
+          "focus": "内存缓存+磁盘缓存+分布式缓存"
+        },
+        {
+          "id": "TM_AST_003_3",
+          "name": "性能优化与监控",
+          "hours": 6,
+          "focus": "性能调优和监控指标"
+        }
+      ],
+      
+      "intelligent_dependencies": ["TM_AST_002"],
+      "performance_requirements": {
+        "rule_execution_time": "<100ms per file",
+        "cache_hit_rate": ">90%",
+        "concurrent_processing": "支持10个并发任务"
+      }
+    },
+
+    {
+      "id": "TM_AST_004",
+      "name": "RESTful API与数据持久化层",
+      "description": "开发标准化RESTful API接口和高效的数据存储方案",
+      "category": "development",
+      "priority": "medium", 
+      "estimated_hours": 24,
+      "complexity_score": 0.4,
+      "assignee": "backend_developer",
+      "auto_generated_reason": "标准化开发，适合中级开发者",
+      
+      "auto_split_subtasks": [
+        {
+          "id": "TM_AST_004_1",
+          "name": "RESTful API设计与实现",
+          "hours": 14,
+          "deliverables": ["OpenAPI规范", "Controller层代码", "API文档"]
+        },
+        {
+          "id": "TM_AST_004_2",
+          "name": "数据模型与持久化",
+          "hours": 10, 
+          "deliverables": ["JPA Entity", "Repository层", "数据库脚本"]
+        }
+      ],
+      
+      "api_specifications": {
+        "endpoints": [
+          "POST /api/v1/analysis/start",
+          "GET /api/v1/analysis/{id}/status", 
+          "GET /api/v1/analysis/{id}/result",
+          "GET /api/v1/rules",
+          "POST /api/v1/rules/validate"
+        ],
+        "response_time_sla": "<500ms for 95% requests"
+      }
+    },
+
+    {
+      "id": "TM_AST_005", 
+      "name": "全栈集成测试与性能验证",
+      "description": "端到端集成测试，验证整个系统的功能完整性和性能指标",
+      "category": "testing",
+      "priority": "high",
+      "estimated_hours": 20,
+      "complexity_score": 0.5,
+      "assignee": "qa_engineer", 
+      "auto_generated_reason": "需要专业测试技能保证质量",
+      
+      "auto_split_subtasks": [
+        {
+          "id": "TM_AST_005_1",
+          "name": "集成测试套件开发",
+          "hours": 8,
+          "focus": "端到端功能验证"
+        },
+        {
+          "id": "TM_AST_005_2", 
+          "name": "性能压力测试",
+          "hours": 6,
+          "focus": "大规模代码库处理能力"
+        },
+        {
+          "id": "TM_AST_005_3",
+          "name": "质量指标验证",
+          "hours": 6,
+          "focus": "准确率和一致性验证"
+        }
+      ],
+      
+      "intelligent_dependencies": ["TM_AST_003", "TM_AST_004"],
+      "test_scenarios": [
+        "处理yudao-cloud完整代码库",
+        "并发10个分析任务",
+        "1GB+代码量的内存使用验证"
+      ]
+    },
+
+    {
+      "id": "TM_AST_006",
+      "name": "生产环境部署与监控体系",
+      "description": "生产环境部署方案设计与实施，建立完善的监控告警体系",
+      "category": "deployment",
+      "priority": "medium",
+      "estimated_hours": 28,
+      "complexity_score": 0.6,
+      "assignee": "devops_engineer",
+      "auto_generated_reason": "部署复杂度中等，需要DevOps专业技能",
+      
+      "intelligent_dependencies": ["TM_AST_005"],
+      "deployment_strategy": "blue_green",
+      "monitoring_requirements": [
+        "系统可用性监控",
+        "性能指标实时监控", 
+        "业务指标监控",
+        "错误率告警"
+      ]
+    }
+  ],
+
+  "intelligent_insights": {
+    "optimization_suggestions": [
+      "任务TM_AST_002和TM_AST_003可以部分并行开发",
+      "建议为TM_AST_001分配额外的技术专家资源",
+      "TM_AST_004可以提前启动API设计阶段"
+    ],
+    "resource_allocation": {
+      "senior_developer": "56小时 (占总工时36%)",
+      "developer": "28小时 (占总工时18%)", 
+      "backend_developer": "24小时 (占总工时15%)",
+      "qa_engineer": "20小时 (占总工时13%)",
+      "devops_engineer": "28小时 (占总工时18%)"
+    },
+    "critical_path": [
+      "TM_AST_001 → TM_AST_002 → TM_AST_003 → TM_AST_005 → TM_AST_006"
+    ],
+    "parallel_opportunities": [
+      "TM_AST_004可与TM_AST_003并行开发",
+      "部分测试准备可提前进行"
+    ]
+  }
+}

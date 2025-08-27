@@ -1,0 +1,235 @@
+{
+  "template_name": "deployment_task",
+  "description": "部署类任务模板，适用于环境搭建、CI/CD配置、监控部署等",
+  "category": "deployment", 
+  "default_priority": "medium",
+
+  "task_structure": {
+    "id": "auto_generated",
+    "name": "required",
+    "description": "required",
+    "estimated_hours": "required",
+    "priority": "medium", 
+    "assignee": "devops_engineer",
+    "dependencies": "often_required",
+    "deliverables": "required",
+    "acceptance_criteria": "required"
+  },
+
+  "subtasks_templates": {
+    "environment_setup": {
+      "name": "环境搭建",
+      "typical_duration": "12-20 hours",
+      "required_skills": ["Linux", "Docker", "环境配置"],
+      "deliverables": [
+        "环境配置脚本",
+        "部署文档",
+        "环境验证报告"
+      ],
+      "acceptance_criteria": [
+        "环境可正常启动",
+        "依赖服务连接正常",
+        "配置文档完整"
+      ]
+    },
+
+    "ci_cd_pipeline": {
+      "name": "CI/CD流水线搭建",
+      "typical_duration": "16-28 hours",
+      "required_skills": ["CI/CD", "GitHub Actions", "自动化"],
+      "deliverables": [
+        "流水线配置文件",
+        "自动化测试集成",
+        "部署脚本"
+      ],
+      "acceptance_criteria": [
+        "自动构建成功",
+        "测试自动执行",
+        "部署流程无误"
+      ]
+    },
+
+    "monitoring_setup": {
+      "name": "监控系统搭建",
+      "typical_duration": "20-32 hours", 
+      "required_skills": ["监控", "告警", "可观测性"],
+      "deliverables": [
+        "监控配置",
+        "告警规则",
+        "运维手册"
+      ],
+      "acceptance_criteria": [
+        "监控覆盖全面",
+        "告警及时准确",
+        "运维流程完善"
+      ]
+    },
+
+    "production_deployment": {
+      "name": "生产环境部署",
+      "typical_duration": "20-32 hours",
+      "required_skills": ["生产部署", "容器化", "安全配置"],
+      "deliverables": [
+        "生产部署方案",
+        "安全配置",
+        "回滚方案"
+      ],
+      "acceptance_criteria": [
+        "部署成功无误",
+        "性能满足要求", 
+        "安全配置到位"
+      ]
+    }
+  },
+
+  "deployment_strategies": {
+    "blue_green": {
+      "description": "蓝绿部署策略",
+      "pros": ["零停机时间", "快速回滚"],
+      "cons": ["资源需求翻倍"],
+      "适用场景": ["生产环境", "高可用要求"]
+    },
+    "rolling": {
+      "description": "滚动部署策略",
+      "pros": ["资源利用率高", "渐进式部署"],
+      "cons": ["部署时间较长"],
+      "适用场景": ["集群环境", "资源有限"]
+    },
+    "canary": {
+      "description": "金丝雀部署策略", 
+      "pros": ["风险可控", "验证效果好"],
+      "cons": ["配置复杂"],
+      "适用场景": ["重要功能上线", "风险控制"]
+    }
+  },
+
+  "environment_types": {
+    "development": {
+      "purpose": "开发测试",
+      "stability_requirement": "medium",
+      "performance_requirement": "low",
+      "security_requirement": "medium",
+      "typical_tasks": [
+        "快速部署验证",
+        "集成测试环境",
+        "开发工具配置"
+      ]
+    },
+    "staging": {
+      "purpose": "预生产验证",
+      "stability_requirement": "high",
+      "performance_requirement": "medium", 
+      "security_requirement": "high",
+      "typical_tasks": [
+        "生产环境模拟",
+        "性能压力测试",
+        "安全渗透测试"
+      ]
+    },
+    "production": {
+      "purpose": "生产服务",
+      "stability_requirement": "critical",
+      "performance_requirement": "high",
+      "security_requirement": "critical", 
+      "typical_tasks": [
+        "高可用部署",
+        "监控告警配置",
+        "灾备方案实施"
+      ]
+    }
+  },
+
+  "quality_gates": {
+    "pre_deployment": {
+      "checks": [
+        "代码质量检查通过",
+        "安全扫描无高危漏洞",
+        "性能测试达标",
+        "文档完整性检查"
+      ]
+    },
+    "post_deployment": {
+      "checks": [
+        "服务健康检查",
+        "关键功能验证",
+        "性能指标监控",
+        "错误率监控"
+      ]
+    }
+  },
+
+  "rollback_procedures": {
+    "automatic_rollback": {
+      "triggers": [
+        "健康检查失败",
+        "错误率超过阈值",
+        "关键功能不可用"
+      ],
+      "action": "自动回滚到上一稳定版本"
+    },
+    "manual_rollback": {
+      "process": [
+        "评估影响范围",
+        "确认回滚版本",
+        "执行回滚操作",
+        "验证回滚结果"
+      ],
+      "decision_criteria": [
+        "业务影响程度",
+        "修复时间估算",
+        "用户体验影响"
+      ]
+    }
+  },
+
+  "security_considerations": {
+    "secrets_management": {
+      "requirements": [
+        "密钥集中管理",
+        "权限最小化原则",
+        "定期密钥轮换"
+      ]
+    },
+    "network_security": {
+      "requirements": [
+        "网络隔离配置",
+        "防火墙规则",
+        "SSL/TLS配置"
+      ]
+    },
+    "compliance": {
+      "standards": ["ISO 27001", "SOC 2"],
+      "auditing": "部署过程可审计"
+    }
+  },
+
+  "common_risks": {
+    "deployment_failure": {
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": [
+        "充分的预部署测试",
+        "分阶段部署策略",
+        "完善的回滚方案"
+      ]
+    },
+    "configuration_drift": {
+      "probability": "medium", 
+      "impact": "medium",
+      "mitigation": [
+        "基础设施即代码",
+        "配置版本控制",
+        "定期配置审计"
+      ]
+    },
+    "security_vulnerability": {
+      "probability": "low",
+      "impact": "critical",
+      "mitigation": [
+        "安全扫描集成",
+        "最小权限原则",
+        "定期安全评估"
+      ]
+    }
+  }
+}

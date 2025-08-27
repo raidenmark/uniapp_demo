@@ -1,0 +1,14 @@
+{
+  "files": {
+    "read": "auth.uid == doc.userId || doc.status == 1",
+    "create": "auth.uid != null",
+    "update": "auth.uid == doc.userId",
+    "delete": "auth.uid == doc.userId"
+  },
+  "users": {
+    "read": "auth.uid == doc._id",
+    "create": false,
+    "update": "auth.uid == doc._id",
+    "delete": false
+  }
+}

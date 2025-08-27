@@ -1,0 +1,132 @@
+{
+    "name" : "unicloud-file-demo",
+    "appid" : "__UNI__FILEAPP",
+    "description" : "UniCloud多端文件管理Demo - 支持图片视频上传、预览、删除等功能",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    /* 5+App特有相关 */
+    "app-plus" : {
+        "usingComponents" : true,
+        "nvueStyleCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
+            "delay" : 0
+        },
+        /* 模块配置 */
+        "modules" : {},
+        /* 应用发布信息 */
+        "distribute" : {
+            /* android打包配置 */
+            "android" : {
+                "permissions" : [
+                    "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+                    "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+                    "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+                    "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+                    "<uses-feature android:name=\"android.hardware.camera\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                ]
+            },
+            /* ios打包配置 */
+            "ios" : {},
+            /* SDK配置 */
+            "sdkConfigs" : {}
+        }
+    },
+    /* 快应用特有相关 */
+    "quickapp" : {},
+    /* 小程序特有相关 */
+    "mp-weixin" : {
+        "appid" : "wx1234567890abcdef",
+        "setting" : {
+            "urlCheck" : false,
+            "es6" : true,
+            "enhance" : true,
+            "postcss" : true,
+            "preloadBackgroundData" : false,
+            "minified" : true,
+            "newFeature" : true,
+            "coverView" : true,
+            "nodeModules" : false,
+            "autoAudits" : false,
+            "showShadowRootInWxmlPanel" : true,
+            "scopeDataCheck" : false,
+            "uglifyFileName" : false,
+            "checkInvalidKey" : true,
+            "checkSiteMap" : true,
+            "uploadWithSourceMap" : true,
+            "compileHotReLoad" : false,
+            "lazyloadPlaceholderEnable" : false,
+            "useMultiFrameRuntime" : true,
+            "useApiHook" : true,
+            "useApiHostProcess" : true,
+            "babelSetting" : {
+                "ignore" : [],
+                "disablePlugins" : [],
+                "outputPath" : ""
+            }
+        },
+        "usingComponents" : true,
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "你的位置信息将用于小程序位置接口的效果展示"
+            },
+            "scope.camera" : {
+                "desc" : "用于拍照上传文件"
+            },
+            "scope.album" : {
+                "desc" : "用于选择相册图片上传"
+            },
+            "scope.record" : {
+                "desc" : "用于录音功能"
+            },
+            "scope.writePhotosAlbum" : {
+                "desc" : "用于保存图片到相册"
+            }
+        },
+        "requiredPrivateInfos" : [
+            "chooseImage",
+            "chooseVideo",
+            "saveImageToPhotosAlbum"
+        ],
+        "lazyCodeLoading" : "requiredComponents",
+        "optimization" : {
+            "subPackages" : true
+        },
+        "cloudfunctionRoot" : "uniCloud/",
+        "navigateToMiniProgramAppIdList" : []
+    },
+    "mp-alipay" : {
+        "appid" : "2021003100000000",
+        "usingComponents" : true,
+        "component2" : true,
+        "enableAppxNg" : true,
+        "axmlStrictCheck" : false,
+        "enableParallelLoader" : false,
+        "enableDistFileMinify" : true,
+        "lazyCodeLoading" : "requiredComponents"
+    },
+    "mp-baidu" : {
+        "usingComponents" : true
+    },
+    "mp-toutiao" : {
+        "usingComponents" : true
+    },
+    "uniStatistics": {  
+        "enable": false
+    },
+    "vueVersion" : "3"
+}

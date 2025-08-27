@@ -1,0 +1,711 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "设计和实现数据层架构",
+        "description": "基于yudao-cloud现有架构，设计并实现PostgreSQL数据库模式，使用MyBatis-Plus创建实体类和Mapper接口，实现代码分析结果的数据持久化层",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "基于yudao-cloud框架现有包结构和规范，设计数据库表结构包括：code_analysis_result(分析结果主表)、code_file_info(文件信息)、code_dependency(依赖关系)、analysis_metrics(质量指标)、optimization_suggestion(优化建议)等表。遵循yudao-cloud的DO(Data Object)命名规范创建MyBatis-Plus实体类。实现Mapper接口继承BaseMapper，配置MyBatis-Plus分页插件和连接池。使用Flyway进行数据库版本管理，遵循yudao-cloud的数据库迁移规范。实现基本的CRUD操作和复杂查询，支持分页和排序。集成yudao-cloud的多租户数据权限机制和审计功能。",
+        "testStrategy": "使用Testcontainers集成测试验证数据库操作，编写Mapper层单元测试确保数据访问正确性。测试多租户场景下的数据隔离功能，验证数据权限注解的正确性。测试覆盖率需要达到80%以上",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "分析yudao-cloud数据层架构规范",
+            "description": "研究yudao-cloud现有的数据层架构模式，包结构，以及MyBatis-Plus配置",
+            "status": "done",
+            "dependencies": [],
+            "details": "<info added on 2025-08-27T07:01:11.456Z>\n已完成yudao-cloud数据层架构分析。发现关键架构模式：\n1. BaseDO继承模式：所有实体继承BaseDO，自动包含审计字段(createTime,updateTime,creator,updater,deleted)\n2. BaseMapperX扩展：继承BaseMapperX提供增强查询能力、分页支持、批量操作\n3. 自动字段填充：DefaultDBFieldHandler通过MetaObjectHandler自动填充审计字段\n4. MyBatis-Plus集成：完整支持分页插件、软删除(@TableLogic)、多租户\n5. 包结构规范：dal.mysql存放Mapper，dal.dataobject存放DO实体\n6. 命名约定：实体类以DO结尾，Mapper以Mapper结尾，表名使用下划线分隔\n\n接下来将基于这些模式设计代码分析系统的数据库表结构。\n</info added on 2025-08-27T07:01:11.456Z>",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "设计代码分析相关数据库表结构",
+            "description": "基于yudao-cloud命名规范设计code_analysis_result、code_file_info、code_dependency等核心表",
+            "status": "done",
+            "dependencies": [],
+            "details": "<info added on 2025-08-27T07:04:25.528Z>\n数据库表结构设计任务已完成。基于yudao-cloud架构规范，成功设计了8个核心数据表：\n\n1. code_analysis_project表：存储项目级分析汇总信息，包含质量评分和复杂度指标\n2. code_file_analysis表：记录文件级分析结果，包含代码行数统计、AST结构和质量指标  \n3. code_class_info表：保存Java类的详细信息，支持继承关系、注解和方法字段统计\n4. code_method_info表：存储方法级分析数据，包含复杂度计算、参数信息和调用关系\n5. code_dependency表：管理多层级依赖关系，支持文件间、类间、方法间的依赖类型\n6. code_quality_issue表：记录代码质量问题，分类存储错误、警告和建议，并跟踪修复状态\n7. code_analysis_report表：支持分析报告的生成和多格式导出功能\n8. code_analysis_cache表：实现分析结果缓存，支持增量分析性能优化\n\n所有表设计严格遵循yudao-cloud框架标准：继承BaseDO基础审计字段、支持软删除机制、集成多租户tenant_id字段、采用snake_case命名约定、配置合适的数据库索引和外键约束。\n\n设计文档已保存至docs/database-design.md，为下一阶段的MyBatis-Plus实体类创建提供了完整的表结构基础。\n</info added on 2025-08-27T07:04:25.528Z>",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "创建MyBatis-Plus实体类（DO）",
+            "description": "按照yudao-cloud的DO命名规范和包结构创建对应的实体类，集成多租户和审计功能",
+            "status": "done",
+            "dependencies": [],
+            "details": "<info added on 2025-08-27T07:09:39.420Z>\n已完成MyBatis-Plus实体类(DO)的创建，严格遵循yudao-cloud架构规范：\n\n创建了8个核心实体类：\n1. CodeAnalysisProjectDO - 项目级分析记录，包含质量评分、复杂度等汇总信息\n2. CodeFileAnalysisDO - 文件级分析结果，包含行数统计、AST结构、质量指标\n3. CodeClassInfoDO - Java类详细信息，包含继承关系、注解、方法字段统计\n4. CodeMethodInfoDO - 方法级分析，包含复杂度、参数信息、调用关系\n5. CodeDependencyDO - 依赖关系，支持文件/类/方法间多种依赖类型\n6. CodeQualityIssueDO - 质量问题，记录错误/警告/建议及修复状态\n7. CodeAnalysisReportDO - 分析报告，支持多格式导出\n8. CodeAnalysisCacheDO - 缓存，支持增量分析优化\n\n所有实体类特点：\n- 继承BaseDO获得审计字段和多租户支持\n- 使用@TableName、@KeySequence等MyBatis-Plus注解\n- JSON字段使用JacksonTypeHandler处理\n- 遵循yudao-cloud包结构和命名规范\n- 使用Lombok注解简化代码\n- 详细的字段注释和业务逻辑设计\n- 支持软删除、分页、批量操作等特性\n</info added on 2025-08-27T07:09:39.420Z>",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "实现Mapper接口和XML配置",
+            "description": "创建继承BaseMapper的Mapper接口，实现复杂查询的XML配置，遵循yudao-cloud编码规范",
+            "status": "done",
+            "dependencies": [],
+            "details": "<info added on 2025-08-27T07:15:14.722Z>\n已完成Mapper接口和XML配置的实现，严格遵循yudao-cloud编码规范：\n\n创建了主要的Mapper接口：\n1. CodeAnalysisProjectMapper - 项目分析Mapper，包含分页查询、统计分析、趋势查询\n2. CodeFileAnalysisMapper - 文件分析Mapper，支持文件类型统计、复杂度排名、问题分析\n3. CodeClassInfoMapper - 类信息Mapper，支持继承关系查询、设计模式分析、框架注解识别\n4. CodeQualityIssueMapper - 质量问题Mapper，支持多维度统计、趋势分析、技术债务计算\n5. CodeAnalysisCacheMapper - 缓存Mapper，支持缓存策略、性能统计、清理机制\n\n所有Mapper特点：\n- 继承BaseMapperX获得增强查询功能\n- 使用@Mapper注解支持Spring扫描\n- 提供丰富的default方法使用LambdaQueryWrapperX\n- 支持分页查询返回PageResult\n- 实现批量操作和复杂统计查询\n- 自定义SQL方法配合XML实现复杂业务逻辑\n- 遵循yudao-cloud命名和结构规范\n- 提供完整的CRUD和业务查询功能\n\nXML配置文件示例：\n- project/CodeAnalysisProjectMapper.xml - 项目趋势统计、质量分布分析\n- quality/CodeQualityIssueMapper.xml - 问题趋势、技术债务、质量门禁统计\n\n所有查询方法支持多租户、软删除等yudao-cloud核心特性。\n</info added on 2025-08-27T07:15:14.722Z>",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "配置MyBatis-Plus和数据源",
+            "description": "基于yudao-cloud现有配置，适配MyBatis-Plus分页插件、连接池和多租户配置",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "集成Flyway数据库版本管理",
+            "description": "按照yudao-cloud的数据库迁移规范配置Flyway，编写初始化和升级脚本",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "实现数据权限和多租户支持",
+            "description": "集成yudao-cloud的数据权限注解和多租户机制，确保数据隔离",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "JavaParser AST解析引擎实现",
+        "description": "基于JavaParser 3.25.6实现Java代码的AST解析功能，支持多种代码分析维度",
+        "details": "创建ASTParserService服务类，使用JavaParser解析Java源码生成抽象语法树。实现代码结构分析：类、方法、字段、注解等信息提取。实现依赖关系分析：import语句解析、方法调用链分析、继承关系识别。支持批量文件解析和增量解析。实现AST遍历器模式，支持自定义分析规则。配置Symbol Solver用于类型解析和跨文件引用分析。处理解析异常和错误恢复机制。",
+        "testStrategy": "使用yudao-cloud项目实际代码进行解析测试，验证AST解析准确性。编写单元测试覆盖各种Java语法结构，性能测试确保单文件解析时间<2秒",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "设计ASTParserService核心服务架构",
+            "description": "定义ASTParserService接口和核心架构，建立AST解析的基础框架",
+            "dependencies": [],
+            "details": "设计ASTParserService接口定义，包括parse()、parseDirectory()、parseWithSymbols()等方法。创建AST解析结果的数据传输对象(DTO)：ParseResult、ClassInfo、MethodInfo、FieldInfo、AnnotationInfo等。设计解析配置类ParseConfig支持自定义解析选项。实现Service层基础架构，集成Spring Boot的@Service注解和依赖注入。定义异常体系：ParseException、FileNotFoundException、SyntaxErrorException等。设计解析结果缓存策略和接口定义。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现基础AST解析功能",
+            "description": "基于JavaParser 3.25.6实现Java代码的基础语法结构解析",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "使用JavaParser.parse()方法解析Java源码生成CompilationUnit。实现ClassInfoExtractor提取类信息：类名、修饰符、泛型参数、继承关系。实现MethodInfoExtractor提取方法信息：方法签名、参数、返回类型、修饰符、注解。实现FieldInfoExtractor提取字段信息：字段类型、初始值、修饰符、注解。实现AnnotationInfoExtractor提取注解信息：注解类型、属性值。支持内部类、枚举、接口等特殊类型解析。处理泛型、Lambda表达式等复杂语法结构。\n<info added on 2025-08-27T10:21:56.446Z>\n成功完成ASTParserService的完整实现，包含核心解析功能、批量处理、缓存机制、代码度量分析等模块。实现了基于文件哈希的智能缓存系统，支持异步和并行解析提升性能。添加了圈复杂度计算和代码行数统计等度量功能。建立了完整的DTO体系和异常处理机制，确保解析错误的收集和报告。通过单元测试验证了单文件解析性能满足<2秒要求，代码严格遵循yudao框架开发规范。\n</info added on 2025-08-27T10:21:56.446Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "开发依赖关系分析模块",
+            "description": "实现import语句解析、方法调用链分析和继承关系识别功能",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "实现ImportAnalyzer解析import语句，提取外部依赖和包依赖关系。开发MethodCallAnalyzer分析方法调用关系：方法调用链、调用频次、调用层级。实现InheritanceAnalyzer识别继承关系：extends、implements、接口实现。开发DependencyGraph构建类间依赖图和模块依赖图。实现循环依赖检测和依赖层级计算。支持静态方法调用、构造函数调用、字段访问等依赖分析。提供依赖关系可视化数据接口。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "实现批量和增量解析策略",
+            "description": "开发支持大型项目的批量文件解析和增量解析机制",
+            "dependencies": [
+              "2.3"
+            ],
+            "details": "实现BatchParserService支持目录批量解析，使用线程池并行处理。开发文件变更监听机制，支持增量解析只处理修改文件。实现解析进度跟踪和状态报告：已处理文件数、成功率、错误统计。设计解析任务队列和优先级调度机制。实现解析结果合并和冲突解决策略。支持解析中断和恢复功能。优化内存使用，支持大文件和大项目解析。集成yudao-cloud的异步任务框架处理长时间解析任务。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "配置Symbol Solver进行类型解析",
+            "description": "集成JavaParser Symbol Solver实现跨文件引用分析和类型解析",
+            "dependencies": [
+              "2.4"
+            ],
+            "details": "配置JavaSymbolSolver支持类型解析和符号查找。设置TypeSolver支持JRE类型、JAR包类型和源码类型解析。实现跨文件引用分析：字段类型解析、方法返回类型解析、参数类型解析。开发CustomTypeSolver支持yudao-cloud项目特定的类型解析需求。实现泛型类型推断和通配符类型处理。支持注解处理器和编译时类型检查。集成项目classpath和依赖JAR包的类型信息。处理类型解析异常和未找到类型的降级策略。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "建立异常处理和错误恢复机制",
+            "description": "实现完善的解析异常处理、错误恢复和日志记录机制",
+            "dependencies": [
+              "2.5"
+            ],
+            "details": "设计分层异常处理策略：语法错误、IO错误、类型解析错误、内存溢出等。实现ParseErrorRecovery支持部分解析成功的场景。开发错误信息收集和分类：语法错误位置、错误类型、修复建议。实现解析超时处理和任务取消机制。集成SLF4J日志框架记录解析过程和错误信息。实现解析质量评估：成功率、错误率、性能指标。提供解析诊断工具和调试信息。建立错误报告和用户反馈机制。集成yudao-cloud的全局异常处理器。",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "缓存系统设计与实现",
+        "description": "基于Redis实现分布式缓存系统，优化代码分析结果的存储和查询性能",
+        "details": "配置Spring Data Redis和Jedis连接池。设计缓存键值策略：文件路径哈希作为主键，支持版本标识。实现多级缓存：热点数据内存缓存、分析结果Redis缓存、数据库持久化。实现缓存更新策略：TTL过期、手动清理、版本变更触发更新。支持缓存预热和批量操作。实现缓存监控和统计，目标缓存命中率≥90%。处理缓存穿透、缓存雪崩等场景。",
+        "testStrategy": "编写缓存服务的单元测试和集成测试，验证缓存一致性和性能。使用Redis监控工具验证缓存命中率，进行并发测试验证缓存的线程安全性",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Redis配置和键值策略设计",
+            "description": "配置Spring Data Redis和Jedis连接池，设计缓存键值策略和基础Redis集成",
+            "dependencies": [],
+            "details": "配置Redis连接池参数和Spring Data Redis集成。设计缓存键值策略：使用文件路径哈希作为主键，支持版本标识和命名空间隔离。创建RedisTemplate和StringRedisTemplate配置，设置序列化策略。配置Redis集群和哨兵模式支持。实现Redis连接健康检查和自动重连机制。创建缓存配置类和常量定义。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "多级缓存架构实现",
+            "description": "实现内存缓存、Redis缓存和数据库持久化的多级缓存架构",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "设计L1内存缓存(Caffeine)存储热点数据，L2 Redis缓存存储分析结果，L3数据库持久化。创建CacheManager抽象层统一管理各级缓存。实现缓存穿透到下一级的fallback机制。设计缓存数据结构和对象映射策略。实现缓存层间数据同步和一致性保证。创建缓存访问统计和性能监控埋点。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "缓存更新策略开发",
+            "description": "开发TTL过期、版本变更触发和手动清理的缓存更新策略",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "实现TTL(Time-To-Live)过期策略，支持不同数据类型的差异化过期时间。开发版本变更触发更新机制，监听文件变更事件自动失效相关缓存。实现手动缓存清理接口，支持按键模式、标签、时间范围批量清理。设计缓存版本控制和原子更新机制。实现缓存预加载和异步更新策略。创建缓存失效通知和日志记录。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "缓存预热和监控实现",
+            "description": "实现缓存预热机制、批量操作支持和性能监控统计功能",
+            "dependencies": [
+              "3.3"
+            ],
+            "details": "实现系统启动时的缓存预热策略，预加载热点数据和常用查询结果。开发批量缓存操作接口，支持pipeline和事务操作提升性能。实现缓存命中率统计、响应时间监控和容量使用跟踪。创建缓存性能仪表板和告警机制，目标缓存命中率≥90%。实现缓存使用情况分析和优化建议生成。集成Spring Boot Actuator暴露缓存监控端点。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "高并发场景处理",
+            "description": "处理缓存穿透、缓存雪崩等高并发场景，实现分布式锁和熔断保护",
+            "dependencies": [
+              "3.4"
+            ],
+            "details": "实现缓存穿透保护：布隆过滤器预检、空值缓存、请求合并等策略。开发缓存雪崩防护：随机TTL、多级缓存、熔断降级机制。实现分布式锁避免缓存击穿，使用Redis分布式锁控制并发更新。集成Hystrix或Sentinel实现熔断保护和限流。进行高并发压力测试和性能调优。实现优雅降级和故障恢复机制。创建并发场景监控和告警。",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "规则引擎和代码质量分析器",
+        "description": "开发基于规则的代码质量分析引擎，实现代码风格、性能和安全性检查",
+        "details": "设计可配置的规则引擎框架：Rule接口、RuleContext上下文、RuleExecutor执行器。实现代码风格规则：命名规范、代码格式、注释完整性检查。实现性能分析规则：循环复杂度、方法长度、类大小、深层嵌套检测。实现安全分析规则：SQL注入检测、XSS漏洞、敏感信息泄露、权限校验。支持自定义规则插件和动态配置。实现规则执行结果的评分算法和严重级别分类。集成CheckStyle、PMD、SpotBugs工具的检查结果。",
+        "testStrategy": "针对每种规则类型编写测试用例，使用已知有问题的代码片段验证规则准确性。性能测试确保规则执行效率，集成测试验证与第三方工具的兼容性",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "设计规则引擎核心架构",
+            "description": "设计可扩展的规则引擎框架，包括Rule接口、RuleContext上下文和RuleExecutor执行器",
+            "dependencies": [],
+            "details": "定义Rule接口规范，支持规则注册、执行和结果返回。设计RuleContext上下文传递AST节点信息、文件路径、配置参数等。实现RuleExecutor执行器负责规则调度、并发执行和结果聚合。建立规则优先级和执行顺序机制。设计规则配置文件格式和动态加载机制。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现代码风格规则集",
+            "description": "开发代码风格检查规则，包括命名规范、代码格式和注释完整性",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "实现命名规范检查：类名、方法名、变量名、常量名的驼峰命名和语义检查。开发代码格式规则：缩进、空格、换行、括号位置等风格检查。实现注释完整性检查：JavaDoc完整性、方法注释、复杂逻辑注释覆盖率。支持不同编码风格配置（Google Style、Oracle Style等）。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "开发性能分析规则",
+            "description": "实现循环复杂度、方法长度、类大小和深层嵌套等性能分析规则",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "实现循环复杂度计算：基于AST分析if、for、while、switch等控制流程。开发方法长度检查：代码行数、参数个数、局部变量数量限制。实现类大小分析：类的方法数、属性数、代码行数检查。检测深层嵌套：方法内嵌套层级、try-catch嵌套深度。建立性能阈值配置和动态调整机制。\n<info added on 2025-08-27T11:35:49.627Z>\n已完成所有四种性能分析规则的实现：CyclomaticComplexityRule（使用McCabe复杂度算法检查决策点数量）、MethodLengthRule（验证代码行数/参数数量/局部变量数量）、ClassSizeRule（分析方法数/字段数/代码行数/内部类数量）、和NestingDepthRule（检测深层if/for/while/try-catch嵌套）。所有规则都包含可配置阈值、严重级别分类、智能建议和全面的单元测试。规则已与yudao框架模式集成，使用AbstractRule基类、正确的DTO用法和元数据存储。\n</info added on 2025-08-27T11:35:49.627Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "实现安全分析规则",
+            "description": "开发SQL注入、XSS漏洞、敏感信息泄露和权限校验等安全检查规则",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "实现SQL注入检测：字符串拼接SQL语句、参数化查询检查。开发XSS漏洞检测：用户输入直接输出、HTML转义检查。实现敏感信息泄露检查：密码、密钥、个人信息硬编码检测。开发权限校验规则：@PreAuthorize注解使用、权限控制完整性检查。建立安全规则知识库和更新机制。\n<info added on 2025-08-27T11:47:16.459Z>\n已完成安全分析规则实现：成功开发了SqlInjectionRule、XssVulnerabilityRule、SensitiveDataLeakRule和AuthorizationRule四个核心安全规则。每个规则都支持双重分析模式（源码分析+AST分析）、可配置参数、严重级别分类和智能修复建议。所有规则已通过全面单元测试验证，与yudao框架深度集成。具体实现包括SQL注入风险的字符串拼接检测和参数化查询验证、XSS漏洞的用户输入输出检测和HTML转义验证、敏感信息泄露的硬编码凭据和个人信息检测、权限控制的@PreAuthorize注解和敏感操作验证。\n</info added on 2025-08-27T11:47:16.459Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "集成第三方代码检查工具",
+            "description": "集成CheckStyle、PMD、SpotBugs等工具，统一检查结果格式",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "集成CheckStyle：配置文件管理、执行结果解析、规则映射转换。集成PMD：规则集配置、结果格式统一、性能优化。集成SpotBugs：字节码分析结果集成、漏洞等级映射。实现工具执行调度和并发控制。建立结果格式统一转换器，支持结果去重和合并。开发工具版本管理和自动更新机制。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "开发规则执行结果评分算法",
+            "description": "实现规则检查结果的评分算法和严重级别分类系统",
+            "dependencies": [
+              "4.2",
+              "4.3",
+              "4.4",
+              "4.5"
+            ],
+            "details": "设计评分算法：基于问题类型、严重程度、影响范围的权重计算。实现严重级别分类：BLOCKER、CRITICAL、MAJOR、MINOR、INFO五个级别。开发评分策略配置：不同项目类型、不同规则的权重调整。实现历史评分趋势分析和对比功能。建立评分基准和校准机制，支持评分算法的持续优化。",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "实现自定义规则插件机制",
+            "description": "开发支持动态加载的自定义规则插件系统和配置管理",
+            "dependencies": [
+              "4.6"
+            ],
+            "details": "设计插件接口规范：继承Rule接口、元数据配置、生命周期管理。实现插件动态加载：类加载器隔离、热插拔支持、依赖注入。开发插件配置管理：参数配置、启用禁用、优先级设置。实现插件仓库管理：本地插件扫描、远程插件下载、版本控制。建立插件开发文档和示例，提供插件开发工具包。",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "yudao-cloud框架适配层",
+        "description": "实现与yudao-cloud框架的深度集成，识别框架特有的业务模式和架构规范",
+        "details": "分析yudao-cloud框架结构：多租户架构、数据权限、微服务模块等。实现框架特征识别器：Controller层规范、Service层事务、VO/DO转换模式。开发yudao-cloud特有的业务规则：租户隔离检查、数据权限注解验证、API接口规范。实现框架升级兼容性检查和版本差异分析。支持模块间依赖分析和循环依赖检测。提供框架最佳实践建议和代码模板推荐。集成yudao-cloud的权限体系和多租户机制。",
+        "testStrategy": "使用yudao-cloud实际项目代码进行适配测试，验证框架特征识别准确性。测试多租户场景下的代码分析功能，确保权限隔离正确",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "yudao-cloud框架深度结构分析",
+            "description": "深入分析yudao-cloud框架的多租户架构、数据权限机制和微服务模块结构",
+            "dependencies": [],
+            "details": "分析external/yudao-cloud目录下的框架代码结构，理解多租户架构实现原理，研究数据权限注解机制，识别微服务模块划分规律。解析框架的核心配置文件、启动类和基础组件，建立框架结构知识库。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "框架特征识别器实现",
+            "description": "实现yudao-cloud特有代码模式的识别器，包括Controller层规范、Service事务和VO/DO转换模式",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "开发框架特征识别器，能够识别yudao-cloud的Controller层注解规范(@PreAuthorize、@ApiOperation)、Service层事务模式(@Transactional使用规范)、VO/DO转换模式(Convert类和映射规则)。使用AST解析技术实现模式匹配算法。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "yudao-cloud业务规则检查器开发",
+            "description": "开发框架特有的业务规则检查器，包括租户隔离检查、数据权限注解验证和API接口规范",
+            "dependencies": [
+              "5.2"
+            ],
+            "details": "实现租户隔离检查规则(TenantIgnore注解验证)、数据权限注解验证(@DataPermission使用规范)、API接口规范检查(统一响应格式、错误码使用)。建立规则引擎框架，支持自定义规则扩展。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "模块依赖分析和循环依赖检测",
+            "description": "实现yudao-cloud项目的模块间依赖关系分析和循环依赖检测功能",
+            "dependencies": [
+              "5.2"
+            ],
+            "details": "开发模块依赖分析器，识别Maven模块间的依赖关系，检测循环依赖问题。实现依赖图构建和可视化，提供依赖优化建议。支持增量依赖分析和依赖变更影响评估。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "框架升级兼容性检查和版本差异分析",
+            "description": "实现yudao-cloud框架版本兼容性检查和版本间差异分析功能",
+            "dependencies": [
+              "5.1",
+              "5.2"
+            ],
+            "details": "开发版本兼容性检查器，分析框架升级对现有代码的影响。实现API变更检测、依赖冲突分析和配置差异对比。提供升级建议和迁移指南生成功能。建立版本差异知识库。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "最佳实践建议引擎和代码模板推荐系统",
+            "description": "建立yudao-cloud框架的最佳实践建议引擎和智能代码模板推荐系统",
+            "dependencies": [
+              "5.2",
+              "5.3",
+              "5.4"
+            ],
+            "details": "构建最佳实践知识库，基于代码分析结果提供个性化改进建议。实现智能代码模板推荐，支持Controller、Service、Mapper等常用模板生成。集成权限体系和多租户机制的最佳实践模板。提供代码质量评分和改进路径建议。",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "RESTful API接口层设计",
+        "description": "设计并实现完整的RESTful API接口，供Claude Code调用获取代码分析服务",
+        "details": "设计API接口规范：统一请求/响应格式、错误码规范、版本控制。实现核心API端点：/api/v1/analysis/file(单文件分析)、/api/v1/analysis/project(项目分析)、/api/v1/analysis/incremental(增量分析)、/api/v1/query/*(查询接口)。支持多种分析模式：同步分析、异步分析、批量分析。实现结果过滤和排序：按文件、包、类、方法维度查询。提供分页支持和结果聚合统计。集成OpenAPI 3.0文档自动生成。实现请求限流和安全认证机制。",
+        "testStrategy": "编写API接口的集成测试，使用Postman或RestAssured验证接口功能。进行API性能测试，确保P95响应时间<1秒。编写OpenAPI文档测试用例",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "设计统一API接口规范",
+            "description": "设计RESTful API的统一规范，包括请求/响应格式、错误码体系和版本控制策略",
+            "dependencies": [],
+            "details": "定义统一的请求响应格式(CommonResult包装)，设计HTTP状态码和业务错误码映射关系，实现API版本控制策略(/api/v1/*)，制定请求参数校验规范和响应数据结构标准。集成yudao-cloud框架的全局异常处理机制。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现核心分析API端点",
+            "description": "开发单文件分析、项目分析和增量分析的核心API接口",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "实现/api/v1/analysis/file接口支持单文件代码分析，开发/api/v1/analysis/project接口进行整项目分析，创建/api/v1/analysis/incremental接口支持增量分析。每个接口支持同步和异步两种分析模式，集成前置任务的缓存系统和规则引擎。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "开发查询和过滤API",
+            "description": "实现按文件、包、类、方法等维度的查询过滤接口",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "开发/api/v1/query/*系列接口，支持按文件路径、包名、类名、方法名等维度查询分析结果。实现结果过滤和排序功能，支持复合查询条件和模糊匹配。提供分页支持和结果聚合统计功能。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "集成OpenAPI文档和分页支持",
+            "description": "集成OpenAPI 3.0自动文档生成和完善的分页查询支持",
+            "dependencies": [
+              "6.2",
+              "6.3"
+            ],
+            "details": "配置SpringDoc OpenAPI 3.0，自动生成API文档和Swagger UI界面。实现统一的分页查询参数(page、size、sort)，提供分页结果包装类。完善API接口的注解文档，包括参数说明、响应示例和错误码说明。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "实现安全认证和性能优化",
+            "description": "实现请求限流、安全认证机制和API性能优化",
+            "dependencies": [
+              "6.2",
+              "6.3"
+            ],
+            "details": "集成yudao-cloud的JWT认证体系，实现API访问权限控制。配置Redis实现请求限流(令牌桶算法)，防止API滥用。实现异步分析任务队列和结果通知机制。进行API性能优化确保P95响应时间<1秒，包括数据库查询优化和缓存策略调整。",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "异步处理和任务队列系统",
+        "description": "实现异步代码分析处理机制，支持大型项目的并发分析和任务管理",
+        "details": "设计任务队列系统：使用Spring Async或消息队列(Redis Stream/RabbitMQ)。实现任务状态管理：PENDING、RUNNING、COMPLETED、FAILED状态。支持任务优先级和调度策略。实现工作线程池：可配置线程数量、任务超时控制。提供任务进度查询接口和WebSocket实时通知。实现任务结果持久化和错误重试机制。支持大文件分块处理和内存优化。提供任务监控和性能统计面板。",
+        "testStrategy": "编写异步任务的单元测试和集成测试，验证任务状态转换正确性。进行并发测试，确保支持100个并发分析请求。测试任务失败重试和恢复机制",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "设计任务队列架构和状态管理",
+            "description": "基于Spring Boot框架设计异步任务队列系统架构，实现任务状态管理和Redis Stream消息队列集成",
+            "dependencies": [],
+            "details": "设计任务队列架构：选择Spring Async或Redis Stream作为消息队列实现。定义任务状态枚举：PENDING、RUNNING、COMPLETED、FAILED，并实现状态转换机制。创建TaskQueueManager服务类管理任务生命周期。设计任务实体类包含ID、状态、优先级、创建时间等字段。实现Redis Stream配置和连接管理。创建任务状态持久化机制到数据库。设计任务优先级队列和调度策略接口。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现工作线程池和任务调度策略",
+            "description": "实现可配置的工作线程池，支持任务优先级调度、超时控制和并发管理",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "配置Spring Async线程池：设置核心线程数、最大线程数、队列容量等参数。实现任务优先级调度器：PriorityTaskScheduler类支持高中低优先级任务调度。实现任务超时控制机制：使用@Async(timeout)或CompletableFuture超时处理。创建WorkerThreadPool管理类控制线程池生命周期。实现任务分发算法：轮询、负载均衡、优先级队列等策略。配置线程池监控和动态调整功能。实现任务取消和中断机制。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "开发任务进度查询和WebSocket实时通知",
+            "description": "实现任务进度查询API和WebSocket实时通知功能，支持前端实时监控任务状态",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "创建TaskProgressController提供RESTful API查询任务状态和进度。实现WebSocket配置类：WebSocketConfig支持任务状态实时推送。创建TaskNotificationService处理任务状态变更通知。设计进度回调接口：TaskProgressCallback支持任务进度更新。实现任务进度存储：使用Redis缓存任务执行进度百分比。创建WebSocket消息格式：包含任务ID、状态、进度、错误信息等。实现连接管理：支持多用户订阅和取消订阅。配置STOMP协议支持复杂消息路由。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "建立任务持久化和错误重试机制",
+            "description": "实现任务结果持久化、错误重试策略和内存优化机制，确保系统稳定性和性能",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "实现任务持久化：TaskPersistenceService将任务结果存储到数据库。设计错误重试策略：指数退避算法、最大重试次数、失败阈值控制。实现内存优化：大文件分块处理、流式处理、及时释放内存资源。创建TaskRetryManager管理失败任务重试逻辑。实现任务结果缓存：使用Redis缓存频繁查询的分析结果。设计任务清理机制：定期清理过期任务和临时文件。实现故障恢复：服务重启后从数据库恢复未完成任务。配置任务监控面板：展示任务统计、性能指标和错误率。编写并发测试确保支持100个并发请求。",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "监控和运维功能实现",
+        "description": "基于Spring Boot Actuator实现系统监控、健康检查和运维管理功能",
+        "details": "配置Spring Boot Actuator端点：health、metrics、info、prometheus等。自定义健康检查指标：数据库连接、Redis连接、分析服务状态。实现业务指标监控：分析任务数量、成功率、平均响应时间、缓存命中率。集成Micrometer指标收集，支持Prometheus格式导出。实现系统资源监控：CPU、内存、磁盘使用率。提供优雅关闭机制和故障自动恢复。实现日志级别动态调整和错误追踪。配置告警机制和邮件通知。",
+        "testStrategy": "编写健康检查和监控指标的测试用例，验证监控数据的准确性。进行压力测试验证系统在高负载下的稳定性，测试优雅关闭功能",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "配置Actuator端点和自定义健康检查",
+            "description": "配置Spring Boot Actuator基础端点并实现数据库、Redis、分析服务等核心组件的健康检查指标",
+            "dependencies": [],
+            "details": "配置application.yml中的Actuator端点：health、metrics、info、prometheus等。实现自定义HealthIndicator：DatabaseHealthIndicator检查数据库连接状态、RedisHealthIndicator检查Redis连接、AnalysisServiceHealthIndicator检查代码分析服务状态。配置健康检查详细信息展示和安全访问控制。实现复合健康检查和依赖服务状态聚合。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现业务监控指标收集",
+            "description": "开发业务相关的监控指标，包括分析任务统计、性能指标和缓存命中率等关键业务数据",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "实现MeterRegistry自定义指标：分析任务数量统计(Counter)、任务成功率计算(Gauge)、平均响应时间监控(Timer)、缓存命中率统计(Gauge)。创建BusinessMetricsService收集和更新业务指标。实现系统资源监控：CPU使用率、内存使用情况、磁盘空间监控。配置指标标签和维度，支持按时间段、任务类型等维度统计。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "集成Micrometer和Prometheus导出",
+            "description": "集成Micrometer指标框架并配置Prometheus格式的指标导出功能",
+            "dependencies": [
+              "8.2"
+            ],
+            "details": "配置Micrometer与Spring Boot Actuator集成，添加Prometheus registry依赖。实现PrometheusMetricsExporter导出器，配置/actuator/prometheus端点。定义自定义指标命名规范和标签策略。实现指标聚合和时间窗口统计。配置Prometheus抓取配置示例和Grafana仪表板模板。优化指标导出性能，避免高频指标影响系统性能。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "开发运维管理和故障处理功能",
+            "description": "实现优雅关闭、故障自动恢复、动态日志调整和告警通知等运维管理功能",
+            "dependencies": [
+              "8.3"
+            ],
+            "details": "实现SmartLifecycle接口的优雅关闭机制，确保分析任务完成后再关闭服务。开发FailureRecoveryService自动故障恢复组件，实现服务重启、缓存重建、连接重连等恢复策略。实现LogLevelManager动态调整日志级别功能，支持通过Actuator端点修改。创建AlertNotificationService告警服务，集成邮件、钉钉等通知方式。实现错误追踪和链路跟踪集成，支持分布式系统问题定位。",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "数据导出和报告生成",
+        "description": "实现代码分析结果的多种格式导出和可视化报告生成功能",
+        "details": "设计报告模板：HTML、JSON、XML、CSV格式支持。实现数据聚合和统计：代码质量趋势、问题分布图表、模块依赖图。提供自定义报告配置：字段选择、过滤条件、排序规则。实现报告缓存和增量更新机制。支持报告定时生成和邮件发送。集成图表库生成可视化报告(ECharts/D3.js)。提供报告模板自定义和扩展机制。实现报告历史版本管理和对比功能。",
+        "testStrategy": "编写各种格式报告生成的测试用例，验证数据准确性和格式正确性。测试大数据量下的报告生成性能，确保内存使用合理",
+        "priority": "low",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "设计多格式报告模板和数据聚合统计",
+            "description": "设计并实现HTML、JSON、XML、CSV等多种格式的报告模板，开发数据聚合和统计功能，包括代码质量趋势分析和问题分布统计",
+            "dependencies": [],
+            "details": "创建ReportTemplateService服务类，设计HTML报告模板支持响应式布局。实现JSON/XML结构化数据导出，支持嵌套数据结构。开发CSV格式导出，处理特殊字符转义。实现DataAggregationService进行数据聚合：代码质量趋势计算、问题类型分布统计、模块依赖关系分析。创建StatisticsCalculator计算各类指标：代码复杂度分布、测试覆盖率趋势、代码重复度统计。支持时间范围筛选和数据分组功能。处理大数据量的分页和流式处理。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "实现自定义报告配置和可视化图表生成",
+            "description": "开发自定义报告配置功能和集成ECharts/D3.js实现数据可视化图表生成，支持灵活的报告定制",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "创建ReportConfigService支持自定义配置：字段选择器、过滤条件构建器、排序规则设置。实现前端配置界面，支持拖拽式报告设计。集成ECharts库生成图表：折线图(趋势分析)、饼图(问题分布)、柱状图(模块对比)、网络图(依赖关系)。开发ChartGeneratorService动态生成图表配置。实现图表数据适配器，支持多维度数据展示。提供图表主题配置和样式自定义。支持图表导出为图片格式。实现图表交互功能：钻取、筛选、缩放。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "开发报告缓存和定时生成管理功能",
+            "description": "实现报告缓存机制、定时任务调度和历史版本管理功能，支持报告的自动化生成和版本控制",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "使用Redis实现报告缓存：设计缓存键策略、设置过期时间、实现增量更新机制。创建ReportCacheService管理缓存生命周期。集成Spring Task Scheduling实现定时报告生成：支持Cron表达式配置、任务并发控制、失败重试机制。开发ReportSchedulerService管理定时任务。实现报告历史版本管理：版本号生成、历史记录存储、版本对比功能。创建ReportVersionService管理版本生命周期。集成邮件发送功能：配置SMTP、HTML邮件模板、附件支持。实现ReportDeliveryService管理报告分发。提供报告生成状态监控和进度追踪。",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "系统集成测试和性能优化",
+        "description": "进行端到端的系统集成测试，性能优化调整，确保满足所有验收标准",
+        "details": "设计端到端测试场景：完整的代码分析流程测试。使用yudao-cloud完整项目(约5000个Java文件)进行系统压测。性能优化：数据库查询优化、缓存策略调整、线程池配置优化、内存使用优化。集成测试：Claude Code API调用测试、并发用户测试、长时间稳定性测试。实现自动化测试流程和CI/CD集成。进行安全测试：SQL注入、XSS攻击、权限绕过等。编写详细的API文档和用户手册。准备Docker容器化部署和生产环境配置。",
+        "testStrategy": "执行完整的系统测试套件，验证所有功能需求。进行性能基准测试，确保满足PRD中的性能指标要求。执行安全测试和代码覆盖率检查，确保≥80%覆盖率",
+        "priority": "high",
+        "dependencies": [
+          8,
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "设计端到端测试场景和自动化测试流程",
+            "description": "设计完整的代码分析流程端到端测试场景，建立自动化测试框架和CI/CD集成",
+            "dependencies": [],
+            "details": "设计端到端测试场景覆盖完整的代码分析流程：从文件上传、AST解析、质量分析、到结果导出的全链路测试。建立基于TestNG/JUnit5的自动化测试框架，配置测试数据管理和清理机制。集成Jenkins/GitHub Actions实现CI/CD自动化测试流程，配置测试报告生成和邮件通知。设计测试用例包括正常流程、异常处理、边界条件等场景，确保测试覆盖率≥80%。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "yudao-cloud项目系统压测",
+            "description": "使用yudao-cloud完整项目(约5000个Java文件)进行大规模系统压力测试",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "准备yudao-cloud完整项目作为测试数据源，配置JMeter/Gatling进行压力测试。测试场景包括：单文件分析、批量文件分析(100/500/1000/5000文件)、并发分析请求。监控系统资源使用情况：CPU、内存、数据库连接池、缓存命中率。记录性能基准数据：响应时间、吞吐量、错误率。识别性能瓶颈点并生成详细的压测报告。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "系统性能优化实施",
+            "description": "基于压测结果进行数据库查询、缓存策略、线程池配置和内存使用的全面优化",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "数据库查询优化：添加必要索引、优化SQL语句、配置连接池参数。缓存策略调整：Redis缓存配置优化、缓存失效策略、缓存预热机制。线程池配置优化：分析解析、质量检查、报告生成等任务的线程池大小调整。内存使用优化：JVM参数调优、对象池化、内存泄漏检查和修复。实施优化后进行性能对比测试，确保优化效果。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Claude Code API集成和并发用户测试",
+            "description": "进行Claude Code API调用测试、并发用户访问测试和长时间稳定性测试",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "实现Claude Code API集成测试：验证API调用的正确性、参数传递、响应格式。设计并发用户测试场景：模拟10/50/100个并发用户同时进行代码分析请求。长时间稳定性测试：7x24小时连续运行测试，监控系统稳定性、内存泄漏、资源释放。测试API限流和熔断机制，验证系统在高负载下的自我保护能力。记录并发性能指标和稳定性数据。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "安全测试和漏洞扫描",
+            "description": "执行全面的安全测试，包括SQL注入、XSS攻击、权限绕过等安全漏洞检测",
+            "dependencies": [
+              "10.4"
+            ],
+            "details": "SQL注入测试：对所有数据输入点进行SQL注入攻击测试，验证参数化查询和输入验证。XSS攻击测试：测试前端输入框、文件上传等功能的XSS防护能力。权限绕过测试：验证认证授权机制、角色权限控制、API访问权限。使用OWASP ZAP/Burp Suite进行自动化安全扫描。进行代码安全审计，检查敏感信息泄露、加密算法使用等。生成安全测试报告和修复建议。",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Docker容器化部署和生产环境配置",
+            "description": "完成Docker容器化部署配置、编写API文档和用户手册，准备生产环境部署",
+            "dependencies": [
+              "10.5"
+            ],
+            "details": "创建Dockerfile和docker-compose.yml配置文件，支持多环境部署(开发/测试/生产)。配置生产环境参数：数据库连接、Redis配置、日志级别、监控配置。编写详细的API文档：接口定义、参数说明、响应格式、错误码说明。编写用户手册：系统安装、配置、使用指南、故障排查。准备Kubernetes部署清单文件，配置服务发现、负载均衡、自动扩缩容。进行容器化部署测试和生产环境验证。",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2024-08-27T10:00:00.000Z",
+      "updated": "2025-08-27T12:21:03.682Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

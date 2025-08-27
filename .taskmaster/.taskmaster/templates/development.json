@@ -1,0 +1,126 @@
+{
+  "template_name": "development_task",
+  "description": "开发类任务模板，适用于代码开发、功能实现等",
+  "category": "development",
+  "default_priority": "high",
+  
+  "task_structure": {
+    "id": "auto_generated",
+    "name": "required",
+    "description": "required", 
+    "estimated_hours": "required",
+    "priority": "high",
+    "assignee": "senior_developer",
+    "dependencies": "optional",
+    "deliverables": "required",
+    "acceptance_criteria": "required"
+  },
+
+  "subtasks_templates": {
+    "ast_analysis": {
+      "name": "AST分析任务",
+      "typical_duration": "16-24 hours",
+      "required_skills": ["Java", "AST", "JavaParser"],
+      "deliverables": [
+        "AST解析代码",
+        "性能测试报告",
+        "技术文档"
+      ],
+      "acceptance_criteria": [
+        "成功解析目标文件",
+        "性能满足要求",
+        "单元测试通过"
+      ]
+    },
+    
+    "agent_development": {
+      "name": "Agent开发任务",
+      "typical_duration": "32-40 hours",
+      "required_skills": ["Java", "Spring Boot", "AI集成"],
+      "deliverables": [
+        "Agent核心代码",
+        "集成测试代码",
+        "API文档"
+      ],
+      "acceptance_criteria": [
+        "Agent功能完整实现",
+        "通过集成测试",
+        "API响应时间<30s"
+      ]
+    },
+
+    "integration_development": {
+      "name": "集成开发任务", 
+      "typical_duration": "20-28 hours",
+      "required_skills": ["Java", "Spring Boot", "API"],
+      "deliverables": [
+        "集成代码",
+        "联调测试报告",
+        "接口文档"
+      ],
+      "acceptance_criteria": [
+        "系统集成成功",
+        "端到端测试通过",
+        "文档完整准确"
+      ]
+    }
+  },
+
+  "splitting_rules": {
+    "by_component": {
+      "description": "按组件拆分任务",
+      "criteria": [
+        "Controller层开发",
+        "Service层开发", 
+        "Entity层开发",
+        "测试代码开发"
+      ]
+    },
+    "by_complexity": {
+      "description": "按复杂度拆分任务",
+      "simple_task_hours": "8-16",
+      "medium_task_hours": "16-32", 
+      "complex_task_hours": "32-40"
+    },
+    "by_dependencies": {
+      "description": "按依赖关系拆分",
+      "independent_tasks": "可并行执行",
+      "dependent_tasks": "需要顺序执行"
+    }
+  },
+
+  "quality_checkpoints": {
+    "code_review": {
+      "required": true,
+      "reviewers_min": 1,
+      "checklist": [
+        "代码风格符合规范",
+        "单元测试完整",
+        "文档更新及时"
+      ]
+    },
+    "testing": {
+      "unit_tests": "required",
+      "integration_tests": "required_for_complex",
+      "coverage_min": 80
+    }
+  },
+
+  "risk_indicators": {
+    "high_risk": [
+      "新技术使用",
+      "复杂业务逻辑",
+      "外部系统依赖"
+    ],
+    "medium_risk": [
+      "数据结构变更",
+      "性能要求严格",
+      "团队成员不熟悉"
+    ],
+    "mitigation_strategies": {
+      "prototype_development": "开发原型验证",
+      "spike_research": "技术预研",
+      "pair_programming": "结对编程"
+    }
+  }
+}

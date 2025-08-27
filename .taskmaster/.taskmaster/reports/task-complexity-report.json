@@ -1,0 +1,85 @@
+{
+	"meta": {
+		"generatedAt": "2025-08-27T07:50:34.596Z",
+		"tasksAnalyzed": 9,
+		"totalTasks": 10,
+		"analysisCount": 9,
+		"thresholdScore": 5,
+		"projectName": "Task Master",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 2,
+			"taskTitle": "JavaParser AST解析引擎实现",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "基于已有的JavaParser 3.25.6依赖和示例代码，将任务分解为：1)设计ASTParserService核心服务架构和接口定义，2)实现基础AST解析功能(类、方法、字段、注解提取)，3)开发依赖关系分析模块(import解析、方法调用链、继承关系)，4)实现批量和增量解析策略，5)配置Symbol Solver进行类型解析和跨文件引用分析，6)建立异常处理和错误恢复机制。每个子任务应包含具体的实现细节和与yudao-cloud框架的集成点。",
+			"reasoning": "该任务具有高复杂性，因为：1)已有基础JavaParser示例代码，但需要扩展为完整的企业级服务；2)需要实现多个维度的代码分析功能；3)需要处理大型项目(yudao-cloud约5000个Java文件)的解析性能；4)需要与Spring Boot框架深度集成；5)Symbol Solver配置和跨文件引用分析技术难度较高；6)错误恢复机制需要考虑各种边缘情况。推荐6个子任务来确保每个核心功能模块都有充分的实现时间。"
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "缓存系统设计与实现",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "基于现有Spring Boot Redis配置和pom.xml中的Redis依赖，将任务分解为：1)配置Redis连接池和Spring Data Redis集成，设计缓存键值策略，2)实现多级缓存架构(内存缓存、Redis缓存、数据库持久化)，3)开发缓存更新策略(TTL过期、版本变更触发、手动清理)，4)实现缓存预热、批量操作和监控统计功能，5)处理缓存穿透、缓存雪崩等高并发场景。每个子任务应包含性能测试和监控指标验证。",
+			"reasoning": "中高复杂性任务：1)项目已配置Redis依赖，有良好基础；2)需要设计企业级多级缓存架构；3)缓存一致性和高并发场景处理有技术挑战；4)需要与现有MyBatis-Plus数据层集成；5)目标缓存命中率≥90%有明确性能要求。5个子任务可以覆盖从基础配置到高级优化的全面实现。"
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "规则引擎和代码质量分析器",
+			"complexityScore": 9,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "基于AST解析引擎(Task 2)的输出，将任务分解为：1)设计可扩展的规则引擎框架(Rule接口、RuleContext、RuleExecutor)，2)实现代码风格规则集(命名规范、格式化、注释完整性)，3)开发性能分析规则(循环复杂度、方法长度、深层嵌套)，4)实现安全分析规则(SQL注入、XSS、敏感信息泄露)，5)集成第三方工具(CheckStyle、PMD、SpotBugs)，6)开发规则执行结果评分算法和严重级别分类，7)实现自定义规则插件机制和动态配置。每个子任务需要包含规则准确性验证和性能基准测试。",
+			"reasoning": "最高复杂性任务：1)需要设计通用且可扩展的规则引擎架构；2)涉及多个技术领域(代码风格、性能、安全)的专业知识；3)需要与多个第三方工具集成；4)要处理复杂的评分算法和结果聚合；5)插件机制和动态配置增加架构复杂性；6)依赖Task 2的AST解析结果。7个子任务确保每个规则类别和技术组件都有充分的开发和测试时间。"
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "yudao-cloud框架适配层",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "基于external/yudao-cloud目录下的大量现有代码，将任务分解为：1)深度分析yudao-cloud框架结构和多租户架构模式，2)实现框架特征识别器(Controller层规范、Service事务、VO/DO转换)，3)开发yudao-cloud特有业务规则(租户隔离、数据权限注解)，4)实现模块间依赖分析和循环依赖检测，5)开发框架升级兼容性检查和版本差异分析，6)建立最佳实践建议引擎和代码模板推荐系统。每个子任务需要使用实际yudao-cloud代码进行验证测试。",
+			"reasoning": "高复杂性任务：1)需要深入理解大型企业级框架(约5000个Java文件)的架构；2)多租户和数据权限是复杂的企业功能；3)需要识别和分析框架特有的代码模式；4)循环依赖检测在大型项目中技术难度高；5)版本兼容性分析需要对框架演进有深度理解；6)依赖Task 2的AST解析能力。6个子任务可以确保对框架的全面理解和准确适配。"
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "RESTful API接口层设计",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "基于Spring Boot Web和Validation依赖，将任务分解为：1)设计统一的API接口规范(请求/响应格式、错误码、版本控制)，2)实现核心分析API端点(单文件、项目、增量分析)，3)开发查询和过滤API(按文件、包、类、方法维度)，4)集成OpenAPI 3.0文档生成和分页支持，5)实现请求限流、安全认证和异步分析支持。每个子任务需要包含API测试和性能验证(P95<1秒)。",
+			"reasoning": "中高复杂性任务：1)需要设计企业级RESTful API规范；2)依赖多个前置任务(缓存、规则引擎、框架适配)的整合；3)需要支持同步和异步多种分析模式；4)API性能要求明确(P95<1秒)；5)需要完整的文档生成和安全机制。5个子任务可以覆盖从基础设计到高级特性的完整实现。"
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "异步处理和任务队列系统",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "基于Spring Boot和Redis基础设施，将任务分解为：1)设计任务队列架构(Spring Async或Redis Stream)和状态管理，2)实现工作线程池和任务调度策略(优先级、超时控制)，3)开发任务进度查询和WebSocket实时通知功能，4)建立任务持久化、错误重试和内存优化机制。每个子任务需要包含并发测试(支持100个并发请求)和故障恢复验证。",
+			"reasoning": "中等复杂性任务：1)有成熟的Spring框架支持；2)异步处理模式相对标准化；3)主要挑战在于任务状态管理和并发控制；4)需要支持100个并发请求有明确性能要求；5)WebSocket通知增加一定复杂性。4个子任务可以覆盖核心异步功能和性能优化。"
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "监控和运维功能实现",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "基于pom.xml中已配置的Spring Boot Actuator，将任务分解为：1)配置Actuator端点和自定义健康检查指标，2)实现业务监控指标(任务数量、响应时间、缓存命中率)，3)集成Micrometer和Prometheus指标导出，4)开发优雅关闭、故障自动恢复和动态日志调整功能。每个子任务需要包含监控数据准确性验证和压力测试。",
+			"reasoning": "中等复杂性任务：1)项目已配置Actuator依赖，有良好基础；2)Spring Boot监控功能相对成熟和标准化；3)主要工作在于配置和业务指标定义；4)Prometheus集成是常见的企业级需求；5)优雅关闭等功能有标准实现模式。4个子任务可以覆盖监控的核心功能。"
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "数据导出和报告生成",
+			"complexityScore": 4,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "基于已有数据层和分析结果，将任务分解为：1)设计多格式报告模板(HTML、JSON、XML、CSV)和数据聚合统计，2)实现自定义报告配置和可视化图表生成(ECharts/D3.js)，3)开发报告缓存、定时生成和历史版本管理功能。每个子任务需要包含大数据量性能测试和报告准确性验证。",
+			"reasoning": "较低复杂性任务：1)主要是数据展示和格式转换，技术相对成熟；2)可以利用现有的报告生成库；3)依赖前面任务的数据结果，核心逻辑相对简单；4)可视化图表有成熟的前端库支持；5)优先级为低，可以作为功能增强。3个子任务足够覆盖核心报告功能。"
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "系统集成测试和性能优化",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "基于完整系统和yudao-cloud测试环境，将任务分解为：1)设计端到端测试场景和自动化测试流程，2)使用yudao-cloud项目(5000个Java文件)进行系统压测，3)执行性能优化(数据库查询、缓存策略、线程池配置)，4)进行Claude Code API调用和并发用户测试，5)实施安全测试(SQL注入、XSS、权限绕过)，6)完成Docker容器化部署和生产环境配置。每个子任务需要满足PRD中的性能指标要求(≥80%覆盖率)。",
+			"reasoning": "高复杂性任务：1)需要整合所有前面任务的成果进行系统级测试；2)大型项目压测(5000个文件)对系统性能和稳定性要求极高；3)涉及多维度测试(功能、性能、安全)；4)需要与Claude Code进行集成测试；5)Docker部署和生产环境配置增加运维复杂性；6)有明确的质量门槛要求。6个子任务确保全面的测试覆盖和系统优化。"
+		}
+	]
+}

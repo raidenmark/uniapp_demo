@@ -1,0 +1,174 @@
+{
+  "template_name": "analysis_task", 
+  "description": "分析类任务模板，适用于需求分析、代码分析、架构分析等",
+  "category": "analysis",
+  "default_priority": "high",
+
+  "task_structure": {
+    "id": "auto_generated",
+    "name": "required",
+    "description": "required",
+    "estimated_hours": "required", 
+    "priority": "high",
+    "assignee": "architect",
+    "dependencies": "optional",
+    "deliverables": "required",
+    "acceptance_criteria": "required"
+  },
+
+  "subtasks_templates": {
+    "code_structure_analysis": {
+      "name": "代码结构分析",
+      "typical_duration": "20-28 hours",
+      "required_skills": ["Architecture", "Java", "设计模式"],
+      "deliverables": [
+        "架构分析报告",
+        "模块依赖图",
+        "设计模式识别报告"
+      ],
+      "acceptance_criteria": [
+        "识别出所有核心模块",
+        "理解分层架构设计", 
+        "绘制完整依赖关系图"
+      ]
+    },
+
+    "coding_style_analysis": {
+      "name": "编码风格分析",
+      "typical_duration": "24-32 hours",
+      "required_skills": ["代码分析", "AST", "模式识别"],
+      "deliverables": [
+        "风格特征数据库",
+        "编码规范提取报告",
+        "模式统计分析"
+      ],
+      "acceptance_criteria": [
+        "命名规范识别准确率≥95%",
+        "注解模式覆盖主要场景", 
+        "风格规则库≥50条"
+      ]
+    },
+
+    "business_pattern_analysis": {
+      "name": "业务模式分析",
+      "typical_duration": "16-24 hours",
+      "required_skills": ["业务分析", "设计模式", "领域建模"],
+      "deliverables": [
+        "业务模式库",
+        "CRUD操作模式分析",
+        "最佳实践总结"
+      ],
+      "acceptance_criteria": [
+        "CRUD模式识别完整",
+        "权限控制规律清晰",
+        "异常处理模式统一"
+      ]
+    },
+
+    "performance_analysis": {
+      "name": "性能分析",
+      "typical_duration": "12-20 hours", 
+      "required_skills": ["性能分析", "监控", "调优"],
+      "deliverables": [
+        "性能基准报告",
+        "瓶颈识别报告",
+        "优化建议方案"
+      ],
+      "acceptance_criteria": [
+        "性能瓶颈识别准确",
+        "基准数据可靠",
+        "优化方案可行"
+      ]
+    }
+  },
+
+  "analysis_methodologies": {
+    "static_analysis": {
+      "description": "静态代码分析",
+      "tools": ["AST Parser", "SonarQube", "PMD"],
+      "focus_areas": [
+        "代码结构",
+        "复杂度分析",
+        "质量指标"
+      ]
+    },
+    "pattern_recognition": {
+      "description": "模式识别分析",
+      "techniques": [
+        "语法树遍历",
+        "统计分析",
+        "机器学习识别"
+      ],
+      "output_formats": [
+        "结构化数据",
+        "可视化图表",
+        "规则配置文件"
+      ]
+    },
+    "comparative_analysis": {
+      "description": "对比分析", 
+      "comparison_dimensions": [
+        "版本间差异",
+        "模块间对比",
+        "行业最佳实践对比"
+      ]
+    }
+  },
+
+  "deliverable_templates": {
+    "analysis_report": {
+      "sections": [
+        "执行摘要",
+        "分析方法", 
+        "关键发现",
+        "数据分析",
+        "结论建议",
+        "附录"
+      ],
+      "format": "markdown",
+      "length": "10-20页"
+    },
+    "technical_specification": {
+      "sections": [
+        "概述",
+        "技术架构",
+        "接口定义",
+        "数据模型",
+        "实施计划"
+      ],
+      "format": "markdown + 图表",
+      "audience": "开发团队"
+    }
+  },
+
+  "quality_criteria": {
+    "completeness": {
+      "coverage_min": 95,
+      "missing_areas_max": 2
+    },
+    "accuracy": {
+      "data_accuracy_min": 98,
+      "pattern_recognition_accuracy_min": 90
+    },
+    "usability": {
+      "actionable_recommendations": true,
+      "clear_visualizations": true,
+      "stakeholder_feedback_positive": true
+    }
+  },
+
+  "common_risks": {
+    "analysis_scope_creep": {
+      "mitigation": "明确分析边界和目标",
+      "early_warning": "分析时间超出预期50%"
+    },
+    "data_quality_issues": {
+      "mitigation": "数据验证和清理流程",
+      "early_warning": "数据不一致或缺失>5%"
+    },
+    "stakeholder_alignment": {
+      "mitigation": "定期评审和反馈收集",
+      "early_warning": "关键利益相关者未参与评审"
+    }
+  }
+}

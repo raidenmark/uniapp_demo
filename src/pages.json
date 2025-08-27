@@ -1,0 +1,46 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "文件管理",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50
+			}
+		},
+		{
+			"path": "pages/upload/upload",
+			"style": {
+				"navigationBarTitleText": "上传文件"
+			}
+		},
+		{
+			"path": "pages/preview/preview",
+			"style": {
+				"navigationBarTitleText": "文件预览"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "文件管理Demo",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#F8F9FA"
+	},
+	"tabBar": {
+		"color": "#999999",
+		"selectedColor": "#007AFF",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "black",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "文件列表"
+			},
+			{
+				"pagePath": "pages/upload/upload",
+				"text": "上传文件"
+			}
+		]
+	}
+}
