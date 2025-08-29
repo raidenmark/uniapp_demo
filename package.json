@@ -5,18 +5,24 @@
   "scripts": {
     "dev": "uni",
     "dev:h5": "uni",
+    "dev:h5:local": "uni --mode local",
+    "dev:h5:cloud": "uni --mode cloud",
     "dev:mp-alipay": "uni -p mp-alipay",
     "dev:mp-weixin": "uni -p mp-weixin",
     "dev:app": "uni -p app",
     "dev:app-android": "uni -p app-android",
     "build": "uni build",
     "build:h5": "uni build",
+    "build:h5:local": "uni build --mode local",
+    "build:h5:cloud": "uni build --mode cloud",
     "build:mp-alipay": "uni build -p mp-alipay",
     "build:mp-weixin": "uni build -p mp-weixin",
     "build:app": "uni build -p app",
     "build:app-android": "uni build -p app-android",
     "type-check": "vue-tsc --noEmit",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "local": "npm run dev:h5:local",
+    "cloud": "npm run dev:h5:cloud"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-4030620241128001",

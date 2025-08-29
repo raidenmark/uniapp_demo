@@ -1,18 +1,23 @@
 /**
  * 文件操作API封装
+ * 支持本地模式和云服务模式
  */
 
 import type { FileRecord, FileUploadParams, FileListParams, UploadProgress } from '@/types/file'
 import type { ApiResponse, PageResponse } from '@/types/common'
 import { getCurrentPlatform } from '@/utils/platform'
 import { generateUniqueFileName } from '@/utils/file'
+import { appConfig, isLocalMode, logger } from '@/config'
+import { localStorageService } from '@/services/localStorageService'
 
 export class FileAPI {
   // 固定Demo用户ID
-  private static readonly DEMO_USER_ID = 'demo_user_001'
+  private static readonly DEMO_USER_ID = isLocalMode ? 
+    (appConfig.local?.mockUserId || 'local_demo_user') : 
+    'demo_user_001'
   
-  // 数据库实例
-  private db = uniCloud.database()
+  // 数据库实例（云服务模式）
+  private db = isLocalMode ? null : uniCloud.database()
   
   /**
    * 上传文件
@@ -20,6 +25,48 @@ export class FileAPI {
   async uploadFile(params: FileUploadParams): Promise<ApiResponse<FileRecord>> {
     try {
       const { filePath, fileType, fileName } = params
+      
+      // 本地模式处理
+      if (isLocalMode) {
+        logger.info('使用本地模式上传文件')
+        
+        // 在H5平台，filePath可能是File对象或base64
+        let file: File
+        if (typeof filePath === 'string' && filePath.startsWith('blob:')) {
+          // 处理blob URL
+          const response = await fetch(filePath)
+          const blob = await response.blob()
+          file = new File([blob], fileName || 'unnamed', { type: blob.type })
+        } else if (filePath instanceof File) {
+          file = filePath
+        } else {
+          // 处理临时文件路径（小程序环境）
+          // 这里需要特殊处理，暂时返回错误
+          throw new Error('本地模式暂不支持小程序文件上传')
+        }
+        
+        const localFile = await localStorageService.uploadFile(file)
+        
+        return {
+          code: 0,
+          message: '上传成功（本地模式）',
+          data: {
+            id: localFile.id,
+            fileName: localFile.fileName,
+            originalName: localFile.originalName,
+            fileType: localFile.fileType,
+            fileUrl: localFile.fileUrl,
+            fileSize: localFile.fileSize,
+            uploadTime: localFile.uploadTime,
+            userId: localFile.userId,
+            platform: localFile.platform,
+            status: 1
+          } as FileRecord
+        }
+      }
+      
+      // 云服务模式处理
+      logger.info('使用云服务模式上传文件')
       
       // 生成唯一文件名
       const uniqueFileName = generateUniqueFileName(fileName || filePath)
@@ -56,7 +103,7 @@ export class FileAPI {
       }
       
       // 保存到数据库
-      const dbResult = await this.db.collection('files').add(fileRecord)
+      const dbResult = await this.db!.collection('files').add(fileRecord)
       
       return {
         code: 0,
@@ -67,7 +114,7 @@ export class FileAPI {
         } as FileRecord
       }
     } catch (error: any) {
-      console.error('文件上传失败:', error)
+      logger.error('文件上传失败:', error)
       return {
         code: -1,
         message: error.message || '上传失败',
@@ -83,6 +130,46 @@ export class FileAPI {
     try {
       const { fileType, page = 1, pageSize = 20 } = params || {}
       
+      // 本地模式处理
+      if (isLocalMode) {
+        logger.info('使用本地模式获取文件列表')
+        
+        const result = await localStorageService.getFileList({
+          userId: FileAPI.DEMO_USER_ID,
+          fileType,
+          pageSize,
+          pageNum: page
+        })
+        
+        const records = result.list.map(f => ({
+          id: f.id,
+          fileName: f.fileName,
+          originalName: f.originalName,
+          fileType: f.fileType,
+          fileUrl: f.fileUrl,
+          fileSize: f.fileSize,
+          uploadTime: f.uploadTime,
+          userId: f.userId,
+          platform: f.platform,
+          status: 1
+        } as FileRecord))
+        
+        return {
+          code: 0,
+          message: '获取成功',
+          data: {
+            list: records,
+            page,
+            pageSize,
+            total: result.total,
+            totalPages: Math.ceil(result.total / pageSize)
+          }
+        }
+      }
+      
+      // 云服务模式处理
+      logger.info('使用云服务模式获取文件列表')
+      
       // 构建where条件
       let where: any = {
         userId: FileAPI.DEMO_USER_ID,
@@ -94,12 +181,12 @@ export class FileAPI {
       }
       
       // 查询总数
-      const countResult = await this.db.collection('files')
+      const countResult = await this.db!.collection('files')
         .where(where)
         .count()
       
       // 查询列表
-      const listResult = await this.db.collection('files')
+      const listResult = await this.db!.collection('files')
         .where(where)
         .orderBy('uploadTime', 'desc')
         .skip((page - 1) * pageSize)
@@ -117,7 +204,7 @@ export class FileAPI {
         }
       }
     } catch (error: any) {
-      console.error('获取文件列表失败:', error)
+      logger.error('获取文件列表失败:', error)
       return {
         code: -1,
         message: error.message || '获取失败',
@@ -136,8 +223,23 @@ export class FileAPI {
    */
   async deleteFile(fileId: string): Promise<ApiResponse<boolean>> {
     try {
+      // 本地模式处理
+      if (isLocalMode) {
+        logger.info('使用本地模式删除文件')
+        const success = await localStorageService.deleteFile(fileId)
+        
+        return {
+          code: success ? 0 : -1,
+          message: success ? '删除成功' : '删除失败',
+          data: success
+        }
+      }
+      
+      // 云服务模式处理
+      logger.info('使用云服务模式删除文件')
+      
       // 1. 先获取文件信息，需要fileUrl来删除云存储文件
-      const fileDetailResult = await this.db.collection('files')
+      const fileDetailResult = await this.db!.collection('files')
         .doc(fileId)
         .get()
       
@@ -157,15 +259,15 @@ export class FileAPI {
           await uniCloud.deleteFile({
             fileList: [fileRecord.fileUrl]
           })
-          console.log('云存储文件删除成功:', fileRecord.fileUrl)
+          logger.log('云存储文件删除成功:', fileRecord.fileUrl)
         } catch (cloudError) {
-          console.warn('云存储文件删除失败（可能已经不存在）:', cloudError)
+          logger.warn('云存储文件删除失败（可能已经不存在）:', cloudError)
           // 云存储删除失败不阻止数据库删除，可能文件已经不存在
         }
       }
       
       // 3. 删除数据库记录（硬删除）
-      await this.db.collection('files')
+      await this.db!.collection('files')
         .doc(fileId)
         .remove()
       
@@ -203,7 +305,7 @@ export class FileAPI {
         data: true
       }
     } catch (error: any) {
-      console.error('软删除文件失败:', error)
+      logger.error('删除文件失败:', error)
       return {
         code: -1,
         message: error.message || '软删除失败',
@@ -217,6 +319,21 @@ export class FileAPI {
    */
   async batchDeleteFiles(fileIds: string[]): Promise<ApiResponse<{ success: string[]; failed: string[] }>> {
     try {
+      // 本地模式处理
+      if (isLocalMode) {
+        logger.info('使用本地模式批量删除文件')
+        const result = await localStorageService.batchDeleteFiles(fileIds)
+        
+        return {
+          code: 0,
+          message: '批量删除完成',
+          data: result
+        }
+      }
+      
+      // 云服务模式处理
+      logger.info('使用云服务模式批量删除文件')
+      
       const results = {
         success: [] as string[],
         failed: [] as string[]
@@ -237,7 +354,7 @@ export class FileAPI {
           results.success.push(fileId)
         } else {
           results.failed.push(fileId)
-          console.error(`删除文件${fileId}失败:`, 
+          logger.error(`删除文件${fileId}失败:`, 
             settledResult.status === 'fulfilled' 
               ? settledResult.value.result.message 
               : settledResult.reason

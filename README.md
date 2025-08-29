@@ -1,6 +1,8 @@
 # UniCloud 多端文件管理 Demo
 
-一个基于 uni-app + Vue3 + TypeScript + UniCloud 的多端文件管理演示项目，支持文件上传、预览、管理等功能。
+一个基于 uni-app + Vue3 + TypeScript 的多端文件管理演示项目，支持文件上传、预览、管理等功能。
+
+> 🎯 **新特性**：支持本地模式和云服务模式，无需配置即可本地运行！
 
 ## 🌟 功能特性
 
@@ -10,19 +12,50 @@
 - 📱 **多端支持**：H5、微信小程序、支付宝小程序、Android APP
 - 🎨 **响应式设计**：自适应不同屏幕尺寸
 - ☁️ **云端存储**：基于 UniCloud 云开发平台
+- 💾 **本地模式**：支持纯本地运行，无需云服务配置
 
 ## 📦 技术栈
 
 - **框架**: uni-app 3.x
 - **前端**: Vue 3 + TypeScript
 - **状态管理**: Pinia
-- **云服务**: UniCloud (阿里云/腾讯云)
+- **云服务**: UniCloud (阿里云/腾讯云) - 可选
+- **本地存储**: LocalStorage (本地模式)
 - **UI组件**: uni-ui
 - **构建工具**: Vite
 
 ## 🚀 快速开始
 
-### 前置要求
+### 🔥 方式一：本地模式（推荐初学者）
+
+无需任何云服务配置，直接本地运行：
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/raidenmark/uniapp_demo.git
+cd uniapp_demo
+
+# 2. 安装依赖
+npm install
+
+# 3. 启动本地模式
+npm run local
+
+# 4. 访问应用
+# 打开浏览器访问 http://localhost:3000
+```
+
+**本地模式特点**：
+- ✅ 无需云服务配置
+- ✅ 数据存储在浏览器 LocalStorage
+- ✅ 支持所有文件管理功能
+- ⚠️ 数据仅保存在当前浏览器
+
+### ☁️ 方式二：云服务模式（生产环境）
+
+使用 UniCloud 云服务，支持多用户和数据持久化：
+
+#### 前置要求
 
 1. **Node.js**: 版本 >= 14.18
 2. **HBuilderX**: 最新版本（推荐）或 VS Code
@@ -43,9 +76,9 @@ npm install
 yarn install
 ```
 
-3. **配置 UniCloud**
+#### 配置 UniCloud
 
-#### 方式一：使用 HBuilderX（推荐）
+**使用 HBuilderX（推荐）**
 1. 用 HBuilderX 打开项目
 2. 右键点击 `uniCloud` 目录
 3. 选择"关联云服务空间"
@@ -53,16 +86,29 @@ yarn install
 5. 右键点击 `uniCloud/database/db_init.json`
 6. 选择"初始化云数据库"
 
-#### 方式二：手动配置
+**手动配置**
 1. 登录 [UniCloud 控制台](https://unicloud.dcloud.net.cn)
 2. 创建服务空间（选择阿里云或腾讯云）
 3. 获取服务空间 ID 和 API Key
-4. 在项目根目录创建 `.env` 文件：
-```env
-VITE_UNICLOUD_SPACE_ID=your-space-id
-VITE_UNICLOUD_CLIENT_SECRET=your-client-secret
-VITE_UNICLOUD_ENDPOINT=your-endpoint
+4. 复制云服务配置文件并填写：
+```bash
+cp .env.cloud .env
+# 编辑 .env 文件，填写你的云服务配置
 ```
+
+5. 启动云服务模式：
+```bash
+npm run cloud
+```
+
+## 🎮 运行模式
+
+项目支持两种运行模式，可通过环境变量切换：
+
+| 模式 | 命令 | 说明 | 适用场景 |
+|------|------|------|----------|
+| 本地模式 | `npm run local` | 使用 LocalStorage | 开发测试、演示 |
+| 云服务模式 | `npm run cloud` | 使用 UniCloud | 生产环境、多用户 |
 
 ### 启动项目
 
@@ -159,20 +205,49 @@ uniapp_demo/
 
 ### 环境变量配置
 
-创建 `.env` 文件并配置以下变量：
+项目提供两套环境配置模板：
+
+#### 本地模式配置（.env.local）
 ```env
-# UniCloud 配置
+# 运行模式
+VITE_RUN_MODE=local
+
+# 本地存储配置
+VITE_LOCAL_STORAGE_TYPE=localStorage
+VITE_LOCAL_MAX_FILE_SIZE=10485760  # 10MB
+VITE_LOCAL_MOCK_USER_ID=local_demo_user
+VITE_LOCAL_MOCK_DELAY=300  # 模拟网络延迟
+
+# 调试配置
+VITE_ENABLE_DEBUG=true
+VITE_ENABLE_CONSOLE_LOG=true
+```
+
+#### 云服务模式配置（.env.cloud）
+```env
+# 运行模式
+VITE_RUN_MODE=cloud
+
+# UniCloud 配置（需要替换为实际值）
 VITE_UNICLOUD_SPACE_ID=your-space-id
 VITE_UNICLOUD_CLIENT_SECRET=your-client-secret
+VITE_UNICLOUD_ENDPOINT=your-endpoint
 
-# API 配置
-VITE_API_BASE_URL=https://your-api.com
-VITE_API_TIMEOUT=30000
+# 生产配置
+VITE_ENABLE_DEBUG=false
+VITE_ENABLE_CONSOLE_LOG=false
+```
 
-# 上传配置
-VITE_MAX_FILE_SIZE=10485760  # 10MB
-VITE_ALLOWED_IMAGE_TYPES=jpg,jpeg,png,gif,webp
-VITE_ALLOWED_VIDEO_TYPES=mp4,mov,avi
+#### 切换运行模式
+```bash
+# 使用本地模式
+cp .env.local .env
+npm run dev:h5
+
+# 使用云服务模式
+cp .env.cloud .env
+# 编辑 .env 文件，填写你的 UniCloud 配置
+npm run dev:h5
 ```
 
 ## 🚢 部署指南
@@ -264,32 +339,51 @@ server {
    - 图片：JPG、PNG、GIF、WebP
    - 视频：MP4、MOV、AVI
 3. **并发上传**：最多同时上传 3 个文件
-4. **存储配额**：根据 UniCloud 服务空间配额
+4. **存储限制**：
+   - 本地模式：50MB（浏览器 LocalStorage）
+   - 云服务模式：根据 UniCloud 服务空间配额
+
+## 🆕 本地模式 vs 云服务模式
+
+| 特性 | 本地模式 | 云服务模式 |
+|------|----------|-------------|
+| 配置难度 | 无需配置 | 需要 UniCloud 配置 |
+| 数据存储 | 浏览器 LocalStorage | UniCloud 云存储 |
+| 数据持久性 | 仅当前浏览器 | 永久保存 |
+| 多用户支持 | 否 | 是 |
+| 跨设备同步 | 否 | 是 |
+| 存储容量 | 5-10MB | 按需扩展 |
+| 适用场景 | 开发、测试、演示 | 生产环境 |
+| 费用 | 完全免费 | 有免费额度 |
 
 ## 🐛 常见问题
 
-### Q1: UniCloud 初始化失败
+### Q1: 本地模式数据丢失
+**原因**：清除浏览器缓存或更换浏览器
+**解决**：本地模式数据存储在 LocalStorage，清除缓存会丢失。建议重要数据使用云服务模式。
+
+### Q2: UniCloud 初始化失败
 **解决方案**：
 1. 检查是否已关联服务空间
 2. 确认服务空间状态正常
 3. 检查网络连接
 4. 查看控制台错误信息
 
-### Q2: 文件上传失败
+### Q3: 文件上传失败
 **可能原因**：
 1. 文件大小超过限制
 2. 文件格式不支持
 3. 网络连接问题
 4. 云存储配额不足
 
-### Q3: 小程序预览白屏
+### Q4: 小程序预览白屏
 **解决方案**：
 1. 检查基础库版本
 2. 确认已配置合法域名
 3. 查看开发者工具控制台
 4. 检查页面路径配置
 
-### Q4: APP 打包失败
+### Q5: APP 打包失败
 **检查项**：
 1. manifest.json 配置是否正确
 2. 图标和启动图资源是否齐全
