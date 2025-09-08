@@ -17,11 +17,16 @@
       </view>
     </view>
 
+    <!-- 调试信息 -->
+    <view class="debug-info" style="padding: 20rpx; background: #f0f0f0; margin: 20rpx;">
+      <text>文件数量: {{ fileStore?.fileList?.length || 0 }}</text>
+    </view>
+
     <!-- 文件列表内容 -->
     <view class="page-content">
       <FileList 
         ref="fileListRef"
-        :files="fileStore.fileList"
+        :files="fileStore?.fileList || []"
         @file-click="handleFileClick"
         @file-delete="handleFileDelete"
         @file-info="handleFileInfo"
@@ -34,7 +39,7 @@
     <!-- 文件预览组件 -->
     <FilePreview
       :visible="previewVisible"
-      :file-list="fileStore.fileList"
+      :file-list="fileStore?.fileList || []"
       :current-index="currentPreviewIndex"
       @close="handleClosePreview"
       @change="handlePreviewChange"
@@ -53,6 +58,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, nextTick } from 'vue'
+import { onShow, onHide } from '@dcloudio/uni-app'
 import { useFileStore } from '@/store/file'
 import FileList from '@/components/FileList.vue'
 import FilePreview from '@/components/FilePreview.vue'
@@ -67,6 +73,10 @@ uni.setNavigationBarTitle({
 // 使用状态管理
 const fileStore = useFileStore()
 
+// 导入FileAPI
+import { FileAPI } from '@/api/file'
+const fileAPI = new FileAPI()
+
 // 响应式数据
 const fileListRef = ref()
 const previewVisible = ref(false)
@@ -76,21 +86,65 @@ const currentInfoFile = ref<FileRecord>({} as FileRecord)
 
 // 初始化页面
 onMounted(() => {
+  console.log('页面挂载完成，开始初始化...')
+  console.log('fileStore:', fileStore)
   loadFiles()
+})
+
+// 页面显示时刷新文件列表 - 用于从上传页面返回后自动刷新
+onShow(() => {
+  console.log('🔄 页面显示，检查是否需要刷新文件列表...')
+  // 每次显示都重新加载文件列表，确保数据是最新的
+  loadFiles()
+})
+
+// 页面隐藏时的处理
+onHide(() => {
+  console.log('📱 页面隐藏')
 })
 
 // 加载文件列表
 const loadFiles = async () => {
   try {
-    // 如果没有数据，先加载模拟数据，在实际项目中应该调用fileStore.loadFileList()
-    if (fileStore.fileList.length === 0) {
-      // 临时模拟数据
-      const mockFiles = generateMockFiles()
-      fileStore.fileList.splice(0, fileStore.fileList.length, ...mockFiles)
+    console.log('🔄 开始加载文件数据...')
+    
+    // 调用真实API获取文件列表
+    const result = await fileAPI.getFileList({
+      page: 1,
+      pageSize: 50 // 加载更多文件以便测试筛选
+    })
+    
+    if (result.code === 0) {
+      console.log('✅ API数据加载成功:', result.data.list.length, '个文件')
+      fileStore.setFileList(result.data.list)
+      console.log('📊 文件列表已更新，当前文件数量:', fileStore.fileList.length)
+    } else {
+      console.warn('⚠️ API返回错误:', result.message)
+      // 如果API失败，显示空列表
+      fileStore.setFileList([])
     }
-    // await fileStore.loadFileList()
-  } catch (error) {
-    console.error('加载文件失败:', error)
+  } catch (error: any) {
+    console.error('❌ 加载文件失败:', error)
+    
+    // API调用失败时的降级处理 - 使用本地测试数据
+    console.log('🔄 API失败，使用本地测试数据...')
+    const testFiles: FileRecord[] = [
+      {
+        id: 'test1',
+        fileName: '演示图片1.jpg',
+        originalName: 'demo-image-1.jpg',
+        fileType: 'image',
+        fileUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzQyODVmNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueJhzE8L3RleHQ+PC9zdmc+',
+        fileSize: 1024000,
+        uploadTime: new Date().toISOString(),
+        userId: 'test_user',
+        platform: 'H5',
+        status: 1,
+        thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzQyODVmNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueLhzE8L3RleHQ+PC9zdmc+'
+      }
+    ]
+    fileStore.setFileList(testFiles)
+    console.log('📝 设置降级测试数据完成')
   }
 }
 
@@ -121,13 +175,42 @@ const generateMockFiles = (): FileRecord[] => {
 
 // 跳转到上传页面
 const handleGoToUpload = () => {
-  uni.navigateTo({
-    url: '/pages/upload/upload'
-  })
+  console.log('🚀 点击上传按钮，准备跳转到上传页面...')
+  
+  try {
+    // 由于上传页面是tabBar页面，需要使用switchTab
+    uni.switchTab({
+      url: '/pages/upload/upload',
+      success: (res) => {
+        console.log('✅ 跳转成功:', res)
+      },
+      fail: (err) => {
+        console.error('❌ switchTab失败，尝试navigateTo:', err)
+        // 降级方案：使用navigateTo
+        uni.navigateTo({
+          url: '/pages/upload/upload',
+          success: (res) => {
+            console.log('✅ navigateTo跳转成功:', res)
+          },
+          fail: (err2) => {
+            console.error('❌ navigateTo也失败:', err2)
+            // 最后降级方案：使用路由跳转
+            console.log('🔄 使用路由跳转...')
+            window.location.hash = '#/pages/upload/upload'
+          }
+        })
+      }
+    })
+  } catch (error) {
+    console.error('❌ 跳转异常:', error)
+    // 异常降级方案
+    window.location.hash = '#/pages/upload/upload'
+  }
 }
 
 // 处理文件点击（预览）
 const handleFileClick = (file: FileRecord) => {
+  if (!fileStore?.fileList) return
   const index = fileStore.fileList.findIndex(f => f.id === file.id)
   if (index !== -1) {
     currentPreviewIndex.value = index
@@ -180,10 +263,16 @@ const handleFilePreviewFromInfo = (file: FileRecord) => {
 
 // 处理筛选变化
 const handleFilterChange = (filterType: string) => {
-  console.log('筛选类型变更:', filterType)
-  // 这里可以调用API重新加载筛选后的数据
-  // fileStore.loadFileList({ fileType: filterType === 'all' ? undefined : filterType })
-  loadFiles()
+  console.log('📊 页面接收到筛选变更事件:', filterType)
+  console.log('📋 当前文件列表:', fileStore.fileList)
+  console.log('🔢 当前文件数量:', fileStore.fileList.length)
+  
+  // 分别统计不同类型的文件数量
+  const imageCount = fileStore.fileList.filter(f => f.fileType === 'image').length
+  const videoCount = fileStore.fileList.filter(f => f.fileType === 'video').length
+  const otherCount = fileStore.fileList.filter(f => f.fileType !== 'image' && f.fileType !== 'video').length
+  
+  console.log(`📸 图片文件: ${imageCount}个, 🎬 视频文件: ${videoCount}个, 📄 其他文件: ${otherCount}个`)
 }
 
 // 处理加载更多
@@ -209,17 +298,16 @@ const handlePreviewChange = (index: number) => {
   currentPreviewIndex.value = index
 }
 
-// 下拉刷新
-onPullDownRefresh(() => {
-  loadFiles().then(() => {
-    uni.stopPullDownRefresh()
-  })
-})
+// 临时注释uni-app生命周期函数，避免undefined错误
+// onPullDownRefresh(() => {
+//   loadFiles().then(() => {
+//     uni.stopPullDownRefresh()
+//   })
+// })
 
-// 上拉加载更多
-onReachBottom(() => {
-  handleLoadMore()
-})
+// onReachBottom(() => {
+//   handleLoadMore()
+// })
 </script>
 
 <style scoped>

@@ -1,312 +1,88 @@
 /**
- * 文件状态管理
+ * 文件状态管理 - 简化版本用于调试
  */
 
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import type { FileRecord, FileUploadParams, FileListParams } from '@/types/file'
-import fileApi from '@/api/file'
-import { 
-  showSuccess, 
-  showError, 
-  showLoading, 
-  hideLoading,
-  FeedbackManager,
-  operationSuccess,
-  operationError,
-  withLoading
-} from '@/utils/feedback'
+import { ref, readonly } from 'vue'
+import type { FileRecord } from '@/types/file'
+import { FileAPI } from '@/api/file'
 
 export const useFileStore = defineStore('file', () => {
-  // 状态
+  console.log('🚀 初始化 FileStore...')
+  
+  // 简化版状态
   const fileList = ref<FileRecord[]>([])
-  const currentFile = ref<FileRecord | null>(null)
   const loading = ref(false)
-  const uploading = ref(false)
   const error = ref<string | null>(null)
-  const uploadProgress = ref(0)
-  const totalCount = ref(0)
-  const currentPage = ref(1)
-  const pageSize = ref(20)
-  const filterType = ref<string>('')
   
-  // 计算属性
-  const imageFiles = computed(() => 
-    fileList.value.filter(file => file.fileType === 'image')
-  )
+  // FileAPI 实例
+  const fileAPI = new FileAPI()
   
-  const videoFiles = computed(() => 
-    fileList.value.filter(file => file.fileType === 'video')
-  )
+  console.log('✅ FileStore 基本状态初始化完成')
   
-  const hasMore = computed(() => {
-    const totalPages = Math.ceil(totalCount.value / pageSize.value)
-    return currentPage.value < totalPages
-  })
-  
-  // 方法
-  
-  /**
-   * 上传文件
-   */
-  async function uploadFile(params: FileUploadParams) {
-    uploading.value = true
-    error.value = null
-    uploadProgress.value = 0
-    
-    try {
-      // 监听上传进度
-      const progressHandler = (event: any) => {
-        uploadProgress.value = event.progress
-      }
-      uni.$on('upload-progress', progressHandler)
-      
-      const result = await fileApi.uploadFile(params)
-      
-      if (result.code === 0 && result.data) {
-        // 添加到列表开头
-        fileList.value.unshift(result.data)
-        totalCount.value++
-        
-        operationSuccess('上传成功')
-        
-        return result.data
-      } else {
-        throw new Error(result.message)
-      }
-    } catch (err: any) {
-      error.value = err.message || '上传失败'
-      operationError(error.value)
-      throw err
-    } finally {
-      uploading.value = false
-      uploadProgress.value = 0
-      uni.$off('upload-progress')
-    }
+  // 简化版方法
+  function setFileList(files: FileRecord[]) {
+    console.log('📝 设置文件列表:', files.length, '个文件')
+    fileList.value = files
   }
   
-  /**
-   * 加载文件列表
-   */
-  async function loadFileList(params?: FileListParams) {
+  function addFile(file: FileRecord) {
+    console.log('➕ 添加文件:', file.fileName)
+    fileList.value.unshift(file)
+  }
+  
+  function removeFile(fileId: string) {
+    console.log('🗑️ 删除文件:', fileId)
+    const index = fileList.value.findIndex(f => f.id === fileId)
+    if (index !== -1) {
+      fileList.value.splice(index, 1)
+      return true
+    }
+    return false
+  }
+  
+  // 异步删除文件（调用API + 更新状态）
+  async function deleteFile(fileId: string): Promise<void> {
+    console.log('🗑️ 开始删除文件:', fileId)
     loading.value = true
     error.value = null
     
     try {
-      const requestParams = {
-        page: params?.page || currentPage.value,
-        pageSize: params?.pageSize || pageSize.value,
-        fileType: params?.fileType || filterType.value || undefined
-      }
+      // 调用API删除服务器文件
+      const result = await fileAPI.deleteFile(fileId)
       
-      const result = await fileApi.getFileList(requestParams)
-      
-      if (result.code === 0 && result.data) {
-        if (requestParams.page === 1) {
-          // 首页替换数据
-          fileList.value = result.data.list
+      if (result.code === 0) {
+        // API删除成功，从本地状态中移除
+        const removed = removeFile(fileId)
+        if (removed) {
+          console.log('✅ 文件删除成功:', fileId)
         } else {
-          // 追加数据
-          fileList.value.push(...result.data.list)
-        }
-        
-        totalCount.value = result.data.total
-        currentPage.value = result.data.page
-        pageSize.value = result.data.pageSize
-        
-        if (params?.fileType !== undefined) {
-          filterType.value = params.fileType
+          console.warn('⚠️ 文件在本地状态中不存在:', fileId)
         }
       } else {
-        throw new Error(result.message)
+        throw new Error(result.message || '删除失败')
       }
     } catch (err: any) {
-      error.value = err.message || '加载失败'
-      showError(error.value)
+      console.error('❌ 文件删除失败:', err)
+      error.value = err.message || '删除失败'
+      throw err
     } finally {
       loading.value = false
     }
   }
   
-  /**
-   * 加载更多
-   */
-  async function loadMore() {
-    if (!hasMore.value || loading.value) return
-    
-    await loadFileList({
-      page: currentPage.value + 1,
-      pageSize: pageSize.value,
-      fileType: filterType.value
-    })
-  }
-  
-  /**
-   * 刷新列表
-   */
-  async function refreshList() {
-    currentPage.value = 1
-    await loadFileList({
-      page: 1,
-      pageSize: pageSize.value,
-      fileType: filterType.value
-    })
-  }
-  
-  /**
-   * 删除单个文件
-   */
-  async function deleteFile(fileId: string) {
-    try {
-      const result = await fileApi.deleteFile(fileId)
-      
-      if (result.code === 0) {
-        // 从列表中移除
-        const index = fileList.value.findIndex(file => file.id === fileId)
-        if (index > -1) {
-          fileList.value.splice(index, 1)
-          totalCount.value = Math.max(0, totalCount.value - 1)
-        }
-        
-        operationSuccess('删除成功')
-        return result
-      } else {
-        throw new Error(result.message)
-      }
-    } catch (err: any) {
-      operationError(err.message || '删除失败')
-      throw err
-    }
-  }
-
-  /**
-   * 批量删除文件
-   */
-  async function batchDeleteFiles(fileIds: string[]) {
-    try {
-      showLoading('批量删除中...')
-      
-      const result = await fileApi.batchDeleteFiles(fileIds)
-      
-      if (result.code === 0 && result.data) {
-        const { success, failed } = result.data
-        
-        // 从列表中移除成功删除的文件
-        success.forEach(fileId => {
-          const index = fileList.value.findIndex(file => file.id === fileId)
-          if (index > -1) {
-            fileList.value.splice(index, 1)
-          }
-        })
-        
-        // 更新总数
-        totalCount.value = Math.max(0, totalCount.value - success.length)
-        
-        if (failed.length === 0) {
-          operationSuccess(`成功删除${success.length}个文件`)
-        } else {
-          showError(`删除完成，成功${success.length}个，失败${failed.length}个`)
-        }
-        
-        return result
-      } else {
-        throw new Error(result.message)
-      }
-    } catch (err: any) {
-      operationError(err.message || '批量删除失败')
-      throw err
-    } finally {
-      hideLoading()
-    }
-  }
-
-  /**
-   * 获取文件详情
-   */
-  async function getFileDetail(fileId: string) {
-    try {
-      const result = await fileApi.getFileDetail(fileId)
-      
-      if (result.code === 0 && result.data) {
-        return result.data
-      } else {
-        throw new Error(result.message)
-      }
-    } catch (err: any) {
-      operationError(err.message || '获取文件详情失败')
-      throw err
-    }
-  }
-  
-  /**
-   * 设置当前文件
-   */
-  function setCurrentFile(file: FileRecord | null) {
-    currentFile.value = file
-  }
-  
-  /**
-   * 清除错误
-   */
-  function clearError() {
-    error.value = null
-  }
-  
-  /**
-   * 更新文件状态 - subtask 4.2要求的updateFileStatus方法
-   */
-  function updateFileStatus(fileId: string, status: number) {
-    const file = fileList.value.find(f => f.id === fileId)
-    if (file) {
-      file.status = status
-    }
-  }
-
-  /**
-   * 重置状态
-   */
-  function resetStore() {
-    fileList.value = []
-    currentFile.value = null
-    loading.value = false
-    uploading.value = false
-    error.value = null
-    uploadProgress.value = 0
-    totalCount.value = 0
-    currentPage.value = 1
-    pageSize.value = 20
-    filterType.value = ''
-  }
+  console.log('🎯 FileStore 方法定义完成')
   
   return {
     // 状态
-    fileList,
-    currentFile,
-    loading,
-    uploading,
-    error,
-    uploadProgress,
-    totalCount,
-    currentPage,
-    pageSize,
-    filterType,
-    
-    // 计算属性
-    imageFiles,
-    videoFiles,
-    hasMore,
+    fileList: readonly(fileList),
+    loading: readonly(loading),
+    error: readonly(error),
     
     // 方法
-    uploadFile,
-    loadFileList,
-    loadMore,
-    refreshList,
-    deleteFile,
-    batchDeleteFiles,
-    getFileDetail,
-    setCurrentFile,
-    updateFileStatus,
-    clearError,
-    resetStore
+    setFileList,
+    addFile,
+    removeFile,
+    deleteFile
   }
 })

@@ -14,15 +14,17 @@
 
     <!-- 上传内容区域 -->
     <view class="upload-content">
-      <!-- 上传组件 -->
-      <FileUploader
-        @upload-success="handleUploadSuccess"
-        @upload-error="handleUploadError"
-        @upload-progress="handleUploadProgress"
-      />
+      <!-- 临时简化的上传组件 -->
+      <view class="simple-uploader">
+        <text class="upload-title">文件上传</text>
+        <button class="upload-button" @click="handleChooseFile" type="primary">
+          选择文件
+        </button>
+        <text class="upload-tips">点击按钮选择要上传的文件（演示功能）</text>
+      </view>
 
       <!-- 上传历史/进度 -->
-      <view v-if="uploadHistory.length > 0" class="upload-history">
+      <view v-if="uploadHistory && uploadHistory.length > 0" class="upload-history">
         <view class="history-title">
           <text class="title-text">上传记录</text>
           <text class="clear-btn" @click="handleClearHistory">清空</text>
@@ -106,9 +108,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import FileUploader from '@/components/FileUploader.vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
+// 临时注释组件导入
+// import FileUploader from '@/components/FileUploader.vue'
 import type { FileRecord, FileType } from '@/types/file'
+import { FileAPI } from '@/api/file'
+import { useFileStore } from '@/store/file'
 
 // 页面标题
 uni.setNavigationBarTitle({
@@ -121,8 +126,195 @@ interface UploadHistoryItem extends FileRecord {
   progress: number
 }
 
+// 使用FileStore进行状态管理
+const fileStore = useFileStore()
+
 // 响应式数据
 const uploadHistory = ref<UploadHistoryItem[]>([])
+
+// 选择文件处理函数
+const handleChooseFile = () => {
+  console.log('🚀 用户点击选择文件')
+  
+  uni.chooseImage({
+    count: 9,
+    sizeType: ['original', 'compressed'],
+    sourceType: ['album', 'camera'],
+    success: async (res) => {
+      console.log('✅ 选择文件成功:', res)
+      uni.showToast({
+        title: `选中${res.tempFilePaths.length}个文件`,
+        icon: 'success'
+      })
+      
+      // 真实上传过程
+      for (const [index, filePath] of res.tempFilePaths.entries()) {
+        try {
+          // 🎯 创建唯一ID，加入随机数避免冲突
+          const uniqueId = `upload_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`
+          
+          // 创建上传历史项目
+          const tempItem: UploadHistoryItem = {
+            id: uniqueId,
+            fileName: `上传中_${index + 1}.jpg`,
+            originalName: filePath.split('/').pop() || '',
+            fileType: 'image' as FileType,
+            fileUrl: filePath,
+            fileSize: 0,
+            uploadTime: new Date().toISOString(),
+            userId: 'local_demo_user',
+            platform: 'H5',
+            status: 'uploading',
+            progress: 0,
+            thumbnail: filePath
+          }
+          
+          uploadHistory.value.push(tempItem)
+          console.log(`📝 添加上传记录 [${index + 1}/${res.tempFilePaths.length}]:`, uniqueId)
+          
+          // 🚀 模拟进度更新
+          const updateProgress = async (progress: number) => {
+            const item = uploadHistory.value.find(item => item.id === uniqueId)
+            if (item && item.status === 'uploading') {
+              item.progress = Math.min(progress, 99) // 保留最后1%给API成功响应
+              console.log(`📊 文件 ${uniqueId} 进度: ${item.progress}%`)
+            }
+            // 添加小延迟模拟真实上传过程
+            await new Promise(resolve => setTimeout(resolve, 100))
+          }
+          
+          // H5环境下需要将blob转换为File对象
+          await updateProgress(10)
+          const response = await fetch(filePath)
+          const blob = await response.blob()
+          await updateProgress(25)
+          
+          const file = new File([blob], `upload_${Date.now()}_${index}.jpg`, { 
+            type: blob.type || 'image/jpeg' 
+          })
+          await updateProgress(40)
+          
+          console.log('🔄 开始上传文件:', file.name, 'ID:', uniqueId)
+          
+          // 调用真实API上传
+          const fileAPI = new FileAPI()
+          await updateProgress(60)
+          
+          const result = await fileAPI.uploadFile({
+            filePath: file,
+            fileType: 'image',
+            fileName: file.name
+          })
+          await updateProgress(90)
+          
+          if (result.code === 0) {
+            // 🎯 通过唯一ID找到对应的历史记录并更新
+            const successItem = uploadHistory.value.find(item => item.id === uniqueId)
+            if (successItem) {
+              successItem.status = 'success'
+              successItem.progress = 100
+              successItem.fileName = result.data.fileName
+              successItem.fileUrl = result.data.fileUrl
+              successItem.fileSize = result.data.fileSize
+              successItem.thumbnail = result.data.thumbnail || result.data.fileUrl
+              // 保持显示用的ID，但记录真实的服务器ID
+              successItem.id = result.data.id
+              console.log(`✅ 更新成功记录 ${uniqueId} -> ${result.data.id}`)
+            }
+            
+            // 🎯 关键修复：上传成功后立即更新FileStore状态
+            console.log('🔄 上传成功，更新FileStore状态...')
+            try {
+              fileStore.addFile(result.data)
+              console.log('✅ FileStore状态更新成功')
+            } catch (storeError) {
+              console.warn('⚠️ FileStore状态更新失败:', storeError)
+            }
+            
+            console.log('✅ 文件上传成功:', result.data)
+            uni.showToast({
+              title: '上传成功',
+              icon: 'success'
+            })
+          } else {
+            // 🎯 通过唯一ID找到对应的历史记录并标记失败
+            const failItem = uploadHistory.value.find(item => item.id === uniqueId)
+            if (failItem) {
+              failItem.status = 'error'
+              failItem.progress = 0
+              console.log(`❌ 标记失败记录 ${uniqueId}`)
+            }
+            console.error('❌ 文件上传失败:', result.message)
+            uni.showToast({
+              title: result.message || '上传失败',
+              icon: 'error'
+            })
+          }
+        } catch (error: any) {
+          console.error('❌ 文件上传异常:', error)
+          
+          // 🎯 通过唯一ID找到对应的历史项目并标记为错误
+          const errorItem = uploadHistory.value.find(item => item.id === uniqueId)
+          if (errorItem) {
+            errorItem.status = 'error'
+            errorItem.progress = 0
+            console.log(`❌ 异常标记失败记录 ${uniqueId}`)
+          }
+          
+          uni.showToast({
+            title: '上传失败: ' + error.message,
+            icon: 'error'
+          })
+        }
+      }
+      
+      // 检查是否所有文件都上传完成
+      const allCompleted = uploadHistory.value.every(item => 
+        item.status === 'success' || item.status === 'error'
+      )
+      
+      if (allCompleted) {
+        const successCount = uploadHistory.value.filter(item => item.status === 'success').length
+        const totalCount = uploadHistory.value.length
+        
+        if (successCount === totalCount) {
+          // 全部成功
+          setTimeout(() => {
+            uni.showModal({
+              title: '上传完成',
+              content: `所有${successCount}个文件上传成功！是否返回文件列表查看？`,
+              success: (modalRes) => {
+                if (modalRes.confirm) {
+                  console.log('🏠 用户确认返回主页，文件状态已同步')
+                  uni.switchTab({
+                    url: '/pages/index/index',
+                    success: () => {
+                      console.log('✅ 返回主页成功，FileStore状态已包含新文件')
+                    }
+                  })
+                }
+              }
+            })
+          }, 1000)
+        } else {
+          // 部分成功
+          uni.showToast({
+            title: `上传完成：成功${successCount}个，失败${totalCount - successCount}个`,
+            icon: 'none',
+            duration: 3000
+          })
+        }
+      }
+    },
+    fail: (err) => {
+      console.error('❌ 选择文件失败:', err)
+      uni.showToast({
+        title: '选择文件失败',
+        icon: 'none'
+      })
+    }
+  })
+}
 
 // 返回上一页
 const handleGoBack = () => {
@@ -132,12 +324,31 @@ const handleGoBack = () => {
       content: '文件正在上传中，确定要离开吗？',
       success: (res) => {
         if (res.confirm) {
-          uni.navigateBack()
+          // 由于上传页面是tabBar页面，使用switchTab跳转到首页
+          uni.switchTab({
+            url: '/pages/index/index'
+          })
         }
       }
     })
   } else {
-    uni.navigateBack()
+    // 由于上传页面是tabBar页面，使用switchTab跳转到首页  
+    console.log('🏠 返回主页，FileStore已包含上传的文件')
+    uni.switchTab({
+      url: '/pages/index/index',
+      success: () => {
+        console.log('✅ 返回首页成功，onShow事件将自动刷新文件列表')
+      },
+      fail: (err) => {
+        console.error('❌ 返回首页失败:', err)
+        // 降级方案：尝试使用navigateBack
+        uni.navigateBack({
+          fail: (err2) => {
+            console.error('❌ navigateBack也失败:', err2)
+          }
+        })
+      }
+    })
   }
 }
 
@@ -301,6 +512,35 @@ onUnmounted(() => {
 .upload-page {
   min-height: 100vh;
   background-color: #f8f9fa;
+}
+
+/* 简化上传组件样式 */
+.simple-uploader {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 60rpx 40rpx;
+  margin: 40rpx;
+  text-align: center;
+  border: 2rpx dashed #d9d9d9;
+}
+
+.upload-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 40rpx;
+}
+
+.upload-button {
+  margin: 40rpx 0;
+  width: 60%;
+}
+
+.upload-tips {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
 }
 
 /* 导航栏 */
@@ -588,4 +828,3 @@ onUnmounted(() => {
 }
 /* #endif */
 </style>
-</template>

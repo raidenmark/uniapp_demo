@@ -9,6 +9,7 @@ import { getCurrentPlatform } from '@/utils/platform'
 import { generateUniqueFileName } from '@/utils/file'
 import { appConfig, isLocalMode, logger } from '@/config'
 import { localStorageService } from '@/services/localStorageService'
+import { serverStorageService } from '@/services/serverStorageService'
 
 export class FileAPI {
   // 固定Demo用户ID
@@ -28,7 +29,7 @@ export class FileAPI {
       
       // 本地模式处理
       if (isLocalMode) {
-        logger.info('使用本地模式上传文件')
+        logger.info('使用服务器模式上传文件')
         
         // 在H5平台，filePath可能是File对象或base64
         let file: File
@@ -45,22 +46,23 @@ export class FileAPI {
           throw new Error('本地模式暂不支持小程序文件上传')
         }
         
-        const localFile = await localStorageService.uploadFile(file)
+        const serverFile = await serverStorageService.uploadFile(file)
         
         return {
           code: 0,
-          message: '上传成功（本地模式）',
+          message: '上传成功（服务器模式）',
           data: {
-            id: localFile.id,
-            fileName: localFile.fileName,
-            originalName: localFile.originalName,
-            fileType: localFile.fileType,
-            fileUrl: localFile.fileUrl,
-            fileSize: localFile.fileSize,
-            uploadTime: localFile.uploadTime,
-            userId: localFile.userId,
-            platform: localFile.platform,
-            status: 1
+            id: serverFile.id,
+            fileName: serverFile.fileName,
+            originalName: serverFile.originalName,
+            fileType: serverFile.fileType,
+            fileUrl: serverStorageService.getFileUrl(serverFile),
+            fileSize: serverFile.fileSize,
+            uploadTime: serverFile.uploadTime,
+            userId: serverFile.userId,
+            platform: serverFile.platform,
+            status: 1,
+            thumbnail: serverFile.thumbnail ? serverStorageService.getFileUrl(serverFile) : undefined
           } as FileRecord
         }
       }
@@ -132,9 +134,9 @@ export class FileAPI {
       
       // 本地模式处理
       if (isLocalMode) {
-        logger.info('使用本地模式获取文件列表')
+        logger.info('使用服务器模式获取文件列表')
         
-        const result = await localStorageService.getFileList({
+        const result = await serverStorageService.getFileList({
           userId: FileAPI.DEMO_USER_ID,
           fileType,
           pageSize,
@@ -146,12 +148,13 @@ export class FileAPI {
           fileName: f.fileName,
           originalName: f.originalName,
           fileType: f.fileType,
-          fileUrl: f.fileUrl,
+          fileUrl: serverStorageService.getFileUrl(f),
           fileSize: f.fileSize,
           uploadTime: f.uploadTime,
           userId: f.userId,
           platform: f.platform,
-          status: 1
+          status: 1,
+          thumbnail: f.thumbnail ? serverStorageService.getFileUrl(f) : undefined
         } as FileRecord))
         
         return {
@@ -225,8 +228,8 @@ export class FileAPI {
     try {
       // 本地模式处理
       if (isLocalMode) {
-        logger.info('使用本地模式删除文件')
-        const success = await localStorageService.deleteFile(fileId)
+        logger.info('使用服务器模式删除文件')
+        const success = await serverStorageService.deleteFile(fileId)
         
         return {
           code: success ? 0 : -1,
@@ -321,8 +324,8 @@ export class FileAPI {
     try {
       // 本地模式处理
       if (isLocalMode) {
-        logger.info('使用本地模式批量删除文件')
-        const result = await localStorageService.batchDeleteFiles(fileIds)
+        logger.info('使用服务器模式批量删除文件')
+        const result = await serverStorageService.batchDeleteFiles(fileIds)
         
         return {
           code: 0,

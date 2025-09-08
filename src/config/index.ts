@@ -75,6 +75,13 @@ const parseArray = (value: string): string[] => {
 const createConfig = (): AppConfig => {
   const runMode = (getEnvVar('VITE_RUN_MODE', 'local') as RunMode)
   
+  // 调试环境变量加载
+  console.log('🔧 环境变量调试:')
+  console.log('VITE_API_BASE_URL:', getEnvVar('VITE_API_BASE_URL', 'http://localhost:3000'))
+  console.log('VITE_RUN_MODE:', runMode)
+  console.log('VITE_ENABLE_MOCK:', getEnvVar('VITE_ENABLE_MOCK', 'true'))
+  console.log('所有import.meta.env:', import.meta.env)
+  
   const config: AppConfig = {
     runMode,
     enableDebug: parseBoolean(getEnvVar('VITE_ENABLE_DEBUG', 'true')),

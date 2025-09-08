@@ -25,8 +25,8 @@
     </view>
     
     <!-- 空状态 -->
-    <view v-if="fileList.length === 0" class="empty-container">
-      <text class="empty-text">暂无文件</text>
+    <view v-if="filteredFileList.length === 0" class="empty-container">
+      <text class="empty-text">{{ currentFilter === 'all' ? '暂无文件' : `暂无${filterTypes.find(t => t.value === currentFilter)?.label}文件` }}</text>
     </view>
     
     <!-- 选择模式操作栏 -->
@@ -36,7 +36,7 @@
       </view>
       <view class="selection-actions">
         <button @click="handleSelectAll" class="select-all-btn">
-          {{ selectedFiles.size === fileList.length ? '取消全选' : '全选' }}
+          {{ selectedFiles.size === filteredFileList.length ? '取消全选' : '全选' }}
         </button>
         <button @click="handleBatchDelete" class="batch-delete-btn" :disabled="selectedFiles.size === 0">
           删除
@@ -50,7 +50,7 @@
     <!-- 文件网格 -->
     <view v-else class="file-grid">
       <view 
-        v-for="file in fileList" 
+        v-for="file in filteredFileList" 
         :key="file.id"
         :class="['file-item', { selected: selectedFiles.has(file.id) }]"
         @click="handleFileClick(file)"
@@ -197,6 +197,20 @@ onMounted(() => {
   }
 })
 
+// 计算过滤后的文件列表
+const filteredFileList = computed(() => {
+  if (currentFilter.value === 'all') {
+    return props.files || []
+  } else if (currentFilter.value === 'image') {
+    return (props.files || []).filter(file => file.fileType === 'image')
+  } else if (currentFilter.value === 'video') {
+    return (props.files || []).filter(file => file.fileType === 'video')
+  } else if (currentFilter.value === 'other') {
+    return (props.files || []).filter(file => file.fileType !== 'image' && file.fileType !== 'video')
+  }
+  return props.files || []
+})
+
 // 监听外部文件列表变化
 watch(() => props.files, (newFiles) => {
   if (newFiles) {
@@ -262,12 +276,21 @@ const loadMoreFiles = async () => {
 const handleFilterChange = (filterType: string) => {
   if (currentFilter.value === filterType) return
   
+  console.log('🔍 筛选类型变更:', filterType)
   currentFilter.value = filterType
   currentPage.value = 1
   hasMore.value = true
   
+  // 清除选择状态
+  selectedFiles.value.clear()
+  selectionMode.value = false
+  
   emit('filter-change', filterType)
-  loadFiles()
+  
+  // 如果是外部传入的文件列表，不需要重新加载
+  if (!props.files || props.files.length === 0) {
+    loadFiles()
+  }
 }
 
 // 处理文件点击
@@ -319,12 +342,12 @@ const toggleFileSelection = (file: FileRecord) => {
 
 // 全选/取消全选
 const handleSelectAll = () => {
-  if (selectedFiles.value.size === fileList.value.length) {
+  if (selectedFiles.value.size === filteredFileList.value.length) {
     // 取消全选
     selectedFiles.value.clear()
   } else {
     // 全选
-    fileList.value.forEach(file => {
+    filteredFileList.value.forEach(file => {
       selectedFiles.value.add(file.id)
     })
   }
@@ -881,4 +904,3 @@ defineExpose({
 }
 /* #endif */
 </style>
-</template>

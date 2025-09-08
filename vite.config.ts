@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
 import uni from '@dcloudio/vite-plugin-uni'
 import { resolve } from 'path'
+import fileServerPlugin from './vite-plugin-file-server'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [uni()],
+  plugins: [uni(), fileServerPlugin()],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -19,7 +20,7 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    open: true
+    open: false
   },
   build: {
     minify: 'terser',

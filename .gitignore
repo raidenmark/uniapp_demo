@@ -19,3 +19,22 @@ dist
 *.njsproj
 *.sln
 *.sw?
+
+# Local environment files
+.env.development.local
+.env.production.local
+.env.local
+
+# Local storage directories
+/uploads
+/data
+/temp
+
+# Test files
+test-*.jpg
+test-*.png
+test-*.txt
+final_test.png
+test.png
+test-image.jpg
+test-upload.txt

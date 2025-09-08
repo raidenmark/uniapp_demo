@@ -26,9 +26,9 @@
 
 ## 🚀 快速开始
 
-### 🔥 方式一：本地模式（推荐初学者）
+### 🔥 方式一：本地服务器模式（推荐）
 
-无需任何云服务配置，直接本地运行：
+内置真实的文件服务器，支持文件持久化存储：
 
 ```bash
 # 1. 克隆项目
@@ -38,18 +38,52 @@ cd uniapp_demo
 # 2. 安装依赖
 npm install
 
-# 3. 启动本地模式
-npm run local
+# 3. 启动本地开发服务器
+npm run dev:h5:local
 
 # 4. 访问应用
-# 打开浏览器访问 http://localhost:3000
+# 本机访问: http://localhost:3000
+# 局域网访问: http://你的IP:3000
 ```
 
-**本地模式特点**：
-- ✅ 无需云服务配置
-- ✅ 数据存储在浏览器 LocalStorage
-- ✅ 支持所有文件管理功能
-- ⚠️ 数据仅保存在当前浏览器
+**本地服务器模式特点**：
+- ✅ 内置完整的文件服务器
+- ✅ 真实的文件上传和存储
+- ✅ 支持跨设备访问（同一局域网）
+- ✅ 文件持久化到本地磁盘
+- ✅ 支持图片和视频上传
+- ✅ 无需配置云服务
+
+### 🔧 跨平台配置（Windows/Mac/Linux）
+
+项目支持通过配置文件适配不同平台和网络环境：
+
+#### 1. 创建本地配置文件
+```bash
+# 创建个人配置文件（不会提交到git）
+cp .env.development .env.development.local
+```
+
+#### 2. 配置API地址
+编辑 `.env.development.local`：
+```env
+# Windows用户 - 设置为你的局域网IP
+VITE_API_HOST=192.168.1.100
+VITE_API_PORT=3000
+
+# Mac/Linux用户 - 监听所有网络接口
+VITE_API_HOST=0.0.0.0
+VITE_API_PORT=3000
+
+# 存储路径配置（相对路径，自动创建）
+VITE_STORAGE_UPLOADS_DIR=./uploads     # 上传文件目录
+VITE_STORAGE_DATA_DIR=./data          # 数据文件目录
+```
+
+#### 3. 目录说明
+- `./uploads/` - 存储用户上传的图片和视频文件
+- `./data/` - 存储文件元数据（files.json数据库）
+- 这些目录会自动创建，无需手动创建
 
 ### ☁️ 方式二：云服务模式（生产环境）
 
