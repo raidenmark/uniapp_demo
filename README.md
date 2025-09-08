@@ -38,12 +38,17 @@ cd uniapp_demo
 # 2. 安装依赖
 npm install
 
-# 3. 启动本地开发服务器
+# 3. 配置API地址（可选）
+# 如需跨设备访问，复制配置示例：
+cp .env.development.local.example .env.development.local
+# 然后编辑 .env.development.local 设置你的IP地址
+
+# 4. 启动本地开发服务器
 npm run dev:h5:local
 
-# 4. 访问应用
+# 5. 访问应用
 # 本机访问: http://localhost:3000
-# 局域网访问: http://你的IP:3000
+# 局域网访问: http://你的IP:3000（需要配置API地址）
 ```
 
 **本地服务器模式特点**：
@@ -60,30 +65,72 @@ npm run dev:h5:local
 
 #### 1. 创建本地配置文件
 ```bash
-# 创建个人配置文件（不会提交到git）
+# 方式1: 复制示例配置文件（推荐）
+cp .env.development.local.example .env.development.local
+
+# 方式2: 从基础配置复制
 cp .env.development .env.development.local
 ```
 
 #### 2. 配置API地址
-编辑 `.env.development.local`：
+
+项目支持两种API地址配置方式，编辑 `.env.development.local`：
+
+**方式A: 完整URL配置（推荐）**
 ```env
-# Windows用户 - 设置为你的局域网IP
-VITE_API_HOST=192.168.1.100
-VITE_API_PORT=3000
+# Windows用户 - 直接设置完整的API地址
+VITE_API_BASE_URL=http://192.168.1.100:3000
 
-# Mac/Linux用户 - 监听所有网络接口
-VITE_API_HOST=0.0.0.0
-VITE_API_PORT=3000
-
-# 存储路径配置（相对路径，自动创建）
-VITE_STORAGE_UPLOADS_DIR=./uploads     # 上传文件目录
-VITE_STORAGE_DATA_DIR=./data          # 数据文件目录
+# Mac/Linux用户 - 设置为本机所有网络接口
+VITE_API_BASE_URL=http://0.0.0.0:3000
 ```
 
-#### 3. 目录说明
-- `./uploads/` - 存储用户上传的图片和视频文件
-- `./data/` - 存储文件元数据（files.json数据库）
-- 这些目录会自动创建，无需手动创建
+**方式B: 分组配置**
+```env
+# 分别设置协议、主机和端口
+VITE_API_PROTOCOL=http
+VITE_API_HOST=192.168.1.100  # 替换为你的实际IP
+VITE_API_PORT=3000
+```
+
+#### 3. 存储路径配置（可选）
+```env
+# 文件存储目录（相对项目根目录，自动创建）
+VITE_STORAGE_UPLOADS_DIR=./uploads     # 上传文件存储目录
+VITE_STORAGE_DATA_DIR=./data          # 数据库文件目录
+VITE_STORAGE_TEMP_DIR=./temp          # 临时文件目录（预留）
+```
+
+#### 4. 获取本机IP地址
+
+**Windows:**
+```cmd
+ipconfig | findstr "IPv4"
+# 例如: 192.168.1.100
+```
+
+**Mac/Linux:**
+```bash
+ifconfig | grep "inet " | grep -v 127.0.0.1
+# 或
+ip addr show | grep "inet " | grep -v 127.0.0.1
+```
+
+#### 5. 配置优先级
+
+配置系统按以下优先级读取：
+1. `VITE_API_BASE_URL` (如果设置，直接使用)
+2. `VITE_API_PROTOCOL://VITE_API_HOST:VITE_API_PORT` (组合配置)
+3. 默认值: `http://localhost:3000`
+
+#### 6. 目录说明
+
+项目会自动创建以下存储目录：
+- `./uploads/` - 存储用户上传的图片和视频文件（实际文件）
+- `./data/` - 存储文件元数据（files.json数据库文件）
+- `./temp/` - 临时文件目录（预留给文件处理功能）
+
+这些目录无需手动创建，首次启动时会自动生成。
 
 ### ☁️ 方式二：云服务模式（生产环境）
 
@@ -239,37 +286,63 @@ uniapp_demo/
 
 ### 环境变量配置
 
-项目提供两套环境配置模板：
+项目提供完整的环境变量配置系统，支持多种配置文件：
 
-#### 本地模式配置（.env.local）
-```env
-# 运行模式
-VITE_RUN_MODE=local
+#### 配置文件说明
 
-# 本地存储配置
-VITE_LOCAL_STORAGE_TYPE=localStorage
-VITE_LOCAL_MAX_FILE_SIZE=10485760  # 10MB
-VITE_LOCAL_MOCK_USER_ID=local_demo_user
-VITE_LOCAL_MOCK_DELAY=300  # 模拟网络延迟
+| 配置文件 | 用途 | 是否提交到git |
+|----------|------|---------------|
+| `.env.development` | 开发环境基础配置 | ✅ 是 |
+| `.env.production` | 生产环境基础配置 | ✅ 是 |
+| `.env.development.local` | 个人开发配置 | ❌ 否 |
+| `.env.production.local` | 个人生产配置 | ❌ 否 |
+| `.env.development.local.example` | 配置示例模板 | ✅ 是 |
 
-# 调试配置
-VITE_ENABLE_DEBUG=true
-VITE_ENABLE_CONSOLE_LOG=true
+#### 快速配置指南
+
+**步骤1：复制配置模板**
+```bash
+# 复制配置示例文件（推荐）
+cp .env.development.local.example .env.development.local
 ```
 
-#### 云服务模式配置（.env.cloud）
+**步骤2：编辑配置文件**
+
+对于**本机使用**（默认）：
 ```env
-# 运行模式
-VITE_RUN_MODE=cloud
+# 保持默认配置即可
+VITE_API_BASE_URL=http://localhost:3000
+```
 
-# UniCloud 配置（需要替换为实际值）
-VITE_UNICLOUD_SPACE_ID=your-space-id
-VITE_UNICLOUD_CLIENT_SECRET=your-client-secret
-VITE_UNICLOUD_ENDPOINT=your-endpoint
+对于**跨设备访问**：
+```env
+# Windows 用户 - 替换为你的实际IP
+VITE_API_BASE_URL=http://192.168.1.100:3000
 
-# 生产配置
-VITE_ENABLE_DEBUG=false
-VITE_ENABLE_CONSOLE_LOG=false
+# Mac/Linux 用户 - 监听所有网络接口
+VITE_API_BASE_URL=http://0.0.0.0:3000
+```
+
+#### 完整配置参考
+
+**本地开发配置示例**：
+```env
+# API配置
+VITE_API_BASE_URL=http://localhost:3000
+VITE_API_TIMEOUT=30000
+
+# 存储配置
+VITE_STORAGE_UPLOADS_DIR=./uploads
+VITE_STORAGE_DATA_DIR=./data
+
+# 文件上传配置
+VITE_MAX_FILE_SIZE=52428800  # 50MB
+VITE_ALLOWED_IMAGE_TYPES=jpg,jpeg,png,gif,webp
+VITE_ALLOWED_VIDEO_TYPES=mp4,mov,avi,mkv,webm
+
+# 开发配置
+VITE_ENABLE_DEBUG=true
+VITE_ENABLE_CONSOLE_LOG=true
 ```
 
 #### 切换运行模式
