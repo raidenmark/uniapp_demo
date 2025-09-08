@@ -24,6 +24,9 @@ export interface AppConfig {
   api: {
     baseUrl: string
     timeout: number
+    host: string
+    port: string
+    protocol: string
   }
   
   // 文件上传配置
@@ -77,7 +80,10 @@ const createConfig = (): AppConfig => {
   
   // 调试环境变量加载
   console.log('🔧 环境变量调试:')
-  console.log('VITE_API_BASE_URL:', getEnvVar('VITE_API_BASE_URL', 'http://localhost:3000'))
+  console.log('VITE_API_BASE_URL:', getEnvVar('VITE_API_BASE_URL'))
+  console.log('VITE_API_HOST:', getEnvVar('VITE_API_HOST', 'localhost'))
+  console.log('VITE_API_PORT:', getEnvVar('VITE_API_PORT', '3000'))
+  console.log('VITE_API_PROTOCOL:', getEnvVar('VITE_API_PROTOCOL', 'http'))
   console.log('VITE_RUN_MODE:', runMode)
   console.log('VITE_ENABLE_MOCK:', getEnvVar('VITE_ENABLE_MOCK', 'true'))
   console.log('所有import.meta.env:', import.meta.env)
@@ -89,8 +95,14 @@ const createConfig = (): AppConfig => {
     enableMock: parseBoolean(getEnvVar('VITE_ENABLE_MOCK', 'true')),
     
     api: {
-      baseUrl: getEnvVar('VITE_API_BASE_URL', 'http://localhost:3000'),
-      timeout: parseNumber(getEnvVar('VITE_API_TIMEOUT'), 30000)
+      // 支持完整URL配置或分组配置
+      baseUrl: getEnvVar('VITE_API_BASE_URL') || 
+        `${getEnvVar('VITE_API_PROTOCOL', 'http')}://${getEnvVar('VITE_API_HOST', 'localhost')}:${getEnvVar('VITE_API_PORT', '3000')}`,
+      timeout: parseNumber(getEnvVar('VITE_API_TIMEOUT'), 30000),
+      // 额外的配置项
+      host: getEnvVar('VITE_API_HOST', 'localhost'),
+      port: getEnvVar('VITE_API_PORT', '3000'),
+      protocol: getEnvVar('VITE_API_PROTOCOL', 'http')
     },
     
     upload: {

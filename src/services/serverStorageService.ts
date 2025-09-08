@@ -39,14 +39,15 @@ class ServerStorageService {
   private readonly mockDelay: number
   
   constructor() {
-    // 直接使用网络IP地址，确保Windows可以访问
-    this.baseUrl = 'http://192.168.74.30:3000'
+    // 从配置文件读取API地址
+    this.baseUrl = appConfig.api.baseUrl
     this.mockDelay = appConfig.local?.mockDelay || 0
     
     // 调试输出
     logger.info('服务器存储服务初始化')
     logger.info('API基础URL:', this.baseUrl)
-    logger.info('配置来源: 直接设置网络IP地址')
+    logger.info('配置来源: appConfig.api.baseUrl')
+    logger.info('当前运行模式:', appConfig.runMode)
   }
   
   // 模拟网络延迟
