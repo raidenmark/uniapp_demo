@@ -153,6 +153,7 @@ cd uniapp_demo
 2. **安装依赖**
 ```bash
 npm install
+若存在依赖冲突则 npm install --legacy-peer-deps
 # 或
 yarn install
 ```
